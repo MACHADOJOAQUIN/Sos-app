@@ -1,186 +1,114 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SOS App Web</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;0,900&display=swap" rel="stylesheet">
+    <title>SOS App Pro - Drive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --bg-color: #111111;
-            --surface-color: #151515;
-            --input-bg: #1A1A1A;
-            --border-color: #2A2A2A;
-            --primary-red: #DC2626;
-            --text-main: #FFFFFF;
-            --text-muted: #888888;
-            --state-pend: #DC2626;
-            --state-prog: #3B82F6;
-            --state-done: #10B981;
-            --badge-yellow: #F59E0B;
+            --bg-color: #0c0c0c;
+            --surface-color: #161616;
+            --input-bg: #1f1f1f;
+            --border-color: #2a2a2a;
+            --primary-red: #e11d48;
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+            --state-pend: #f43f5e;
+            --state-prog: #3b82f6;
+            --state-done: #10b981;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #000; display: flex; justify-content: center; height: 100vh; overflow: hidden; color: var(--text-main); }
         
-        body { background-color: #000; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
-        input, textarea { user-select: auto; }
+        #app-container { width: 100%; max-width: 480px; height: 100%; background-color: var(--bg-color); display: flex; flex-direction: column; position: relative; }
 
-        /* Contenedor Principal */
-        #app-container {
-            width: 100%; max-width: 480px; height: 100%; background-color: var(--bg-color);
-            display: flex; flex-direction: column; position: relative; overflow: hidden;
-        }
+        /* Header y Auth */
+        header { padding: 20px 16px 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+        .logo { color: var(--primary-red); font-size: 28px; font-weight: 900; letter-spacing: 1px; }
+        
+        #auth-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: white; padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+        #auth-btn.logged-in { border-color: var(--state-done); color: var(--state-done); }
 
-        /* HEADER */
-        header { padding: 20px 16px 10px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { color: var(--primary-red); font-size: 32px; font-weight: 900; letter-spacing: 2px; }
-        .header-actions { display: flex; align-items: center; gap: 16px; }
-        .header-actions > i { color: var(--text-main); font-size: 20px; cursor: pointer; }
-        
-        /* Selector de Mes Personalizado */
-        .month-selector {
-            display: flex; align-items: center; background: var(--input-bg);
-            border: 1px solid var(--border-color); border-radius: 20px; padding: 4px 8px; gap: 4px;
-        }
-        .month-selector button {
-            background: transparent; border: none; color: var(--text-muted); cursor: pointer;
-            padding: 6px 8px; font-size: 13px; transition: color 0.2s; display: flex; align-items: center; justify-content: center;
-        }
-        .month-selector button:active { color: white; }
-        .month-selector span {
-            color: var(--text-main); font-size: 13px; font-weight: bold; min-width: 90px;
-            text-align: center; cursor: pointer; text-transform: capitalize; padding: 0 4px;
-        }
+        /* Selector de Mes e Historial */
+        .month-selector { display: flex; align-items: center; background: var(--input-bg); border-radius: 25px; padding: 4px 10px; gap: 8px; margin: 10px 16px; border: 1px solid var(--border-color); justify-content: space-between; }
+        .month-selector button { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 8px; font-size: 14px; }
+        .month-selector span { font-size: 14px; font-weight: bold; text-transform: capitalize; min-width: 100px; text-align: center; }
+        .btn-all-history.active { color: var(--primary-red) !important; }
 
-        /* BARRAS DE ORDEN Y FILTRO */
-        .scroll-bar { display: flex; overflow-x: auto; padding: 10px 16px; gap: 10px; scrollbar-width: none; }
-        .scroll-bar::-webkit-scrollbar { display: none; }
-        
-        .chip {
-            padding: 8px 14px; border-radius: 12px; font-size: 12px; font-weight: bold; cursor: pointer;
-            white-space: nowrap; border: 1px solid var(--border-color); color: var(--text-muted); background: var(--input-bg);
-            display: flex; align-items: center; gap: 8px; transition: all 0.2s;
-        }
-        .chip-sort.active { background: var(--text-main); color: #000; border-color: var(--text-main); }
-        .chip-filter.active { background: var(--primary-red); color: var(--text-main); border-color: var(--primary-red); }
-        
-        .badge-count { background: rgba(255,255,255,0.2); color: var(--text-main); padding: 2px 6px; border-radius: 10px; font-size: 11px; }
+        /* Filtros y Lista */
+        .scroll-bar { display: flex; overflow-x: auto; padding: 5px 16px 15px; gap: 10px; scrollbar-width: none; }
+        .chip { padding: 8px 16px; border-radius: 15px; font-size: 12px; font-weight: bold; cursor: pointer; border: 1px solid var(--border-color); color: var(--text-muted); background: var(--surface-color); white-space: nowrap; }
+        .chip.active { background: var(--primary-red); color: white; border-color: var(--primary-red); }
+        .chip-sort.active { background: white; color: black; }
 
-        /* LISTA PRINCIPAL */
-        main { flex: 1; overflow-y: auto; padding: 10px 16px 20px; }
+        main { flex: 1; overflow-y: auto; padding: 0 16px 100px; }
+        .card { background: var(--surface-color); border-radius: 18px; display: flex; margin-bottom: 12px; overflow: hidden; border: 1px solid var(--border-color); }
+        .card-border { width: 5px; }
+        .card-content { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; }
+        .card-id { color: var(--primary-red); font-size: 16px; font-weight: 900; }
+        .card-price { font-size: 20px; font-weight: 900; }
+        .card-info { display: flex; gap: 12px; color: var(--text-muted); font-size: 12px; font-weight: 500; }
         
-        .empty-state { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); text-align: center; }
-        .empty-state i { font-size: 60px; margin-bottom: 16px; opacity: 0.5; }
-        .empty-state h3 { color: var(--text-main); font-size: 20px; margin-bottom: 8px; }
+        /* Footer y Totales */
+        footer { position: absolute; bottom: 0; width: 100%; background: rgba(22, 22, 22, 0.95); backdrop-filter: blur(10px); border-top: 1px solid var(--border-color); padding: 15px 25px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .total-amount { font-size: 28px; font-weight: 900; letter-spacing: -1px; }
+        .fab { background: var(--primary-red); width: 65px; height: 55px; border-radius: 18px; border: none; color: white; font-size: 24px; cursor: pointer; box-shadow: 0 8px 20px rgba(225, 29, 72, 0.3); display: flex; align-items: center; justify-content: center; }
 
-        .card { background: var(--surface-color); border-radius: 16px; display: flex; margin-bottom: 12px; overflow: hidden; position: relative; }
-        .card-border { width: 4px; background: var(--primary-red); flex-shrink: 0; }
-        .card-content { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 12px; }
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; }
-        .card-id { color: var(--primary-red); font-size: 18px; font-weight: bold; }
-        .card-date { color: var(--text-muted); font-size: 13px; margin-left: 8px; }
-        .card-price { color: var(--text-main); font-size: 20px; font-weight: bold; }
-        
-        .card-info { display: flex; gap: 12px; color: var(--text-muted); font-size: 13px; font-weight: 500; align-items: center; }
-        .card-info i { font-size: 14px; }
-        .card-motivo { color: var(--text-muted); font-size: 13px; font-style: italic; }
-        
-        .card-footer { display: flex; justify-content: space-between; align-items: flex-end; }
-        .badges-container { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
-        .text-badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; }
-        
-        .card-actions { display: flex; gap: 8px; }
-        .btn-icon { background: #1E1E1E; border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-
-        /* FOOTER */
-        footer { background: var(--surface-color); border-top: 1px solid var(--border-color); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
-        .total-label { color: var(--text-muted); font-size: 10px; font-weight: bold; letter-spacing: 1px; margin-bottom: 2px; display: block; }
-        .total-amount { color: var(--text-main); font-size: 26px; font-weight: bold; }
-        .fab { background: var(--primary-red); width: 64px; height: 56px; border-radius: 16px; border: none; color: white; font-size: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3); }
-
-        /* MODALES */
-        .modal-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 100; display: flex; justify-content: center; align-items: flex-end; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        /* Modales */
+        .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; display: flex; justify-content: center; align-items: flex-end; opacity: 0; pointer-events: none; transition: 0.3s; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
-        
-        .bottom-sheet { background: var(--bg-color); width: 100%; height: 95%; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.1, 0.8, 0.3, 1); }
+        .bottom-sheet { background: var(--bg-color); width: 100%; height: 90%; border-radius: 25px 25px 0 0; transform: translateY(100%); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 25px; overflow-y: auto; }
         .modal-overlay.active .bottom-sheet { transform: translateY(0); }
         
-        .sheet-header { display: flex; align-items: center; padding: 16px; }
-        .btn-close { background: var(--input-bg); border: none; color: white; width: 40px; height: 40px; border-radius: 10px; font-size: 18px; cursor: pointer; }
-        .sheet-title { flex: 1; text-align: center; color: white; font-size: 18px; font-weight: bold; margin-right: 40px; }
-        
-        .sheet-body { flex: 1; overflow-y: auto; padding: 16px; }
-        
-        .input-group { margin-bottom: 16px; }
-        .input-group label { display: block; color: var(--text-muted); font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 8px; }
-        .input-group input { width: 100%; background: var(--input-bg); border: 1px solid var(--border-color); color: white; font-size: 16px; padding: 16px; border-radius: 12px; outline: none; }
-        .input-group input:focus { border-color: var(--primary-red); }
-        
-        .row { display: flex; gap: 16px; }
-        .row .input-group { flex: 1; }
+        .input-group { margin-bottom: 18px; }
+        .input-group label { display: block; color: var(--text-muted); font-size: 11px; font-weight: bold; margin-bottom: 8px; letter-spacing: 1px; }
+        .input-group input, .input-group select { width: 100%; background: var(--input-bg); border: 1px solid var(--border-color); color: white; padding: 15px; border-radius: 12px; outline: none; font-size: 16px; }
 
-        .estado-selector { display: flex; gap: 8px; margin-bottom: 24px; }
-        .estado-btn { flex: 1; padding: 12px 0; background: var(--input-bg); border-radius: 12px; color: var(--text-muted); text-align: center; font-weight: bold; font-size: 13px; cursor: pointer; transition: 0.2s; }
-        .estado-btn.active { background: white; color: black; }
-
-        .toggle-row { display: flex; justify-content: space-between; align-items: center; background: var(--input-bg); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: 12px; margin-bottom: 16px; }
-        .toggle-label { color: white; font-size: 16px; }
-        .toggle-btn { padding: 6px 16px; border-radius: 6px; font-weight: bold; color: white; cursor: pointer; font-size: 14px; transition: 0.2s;}
-        .toggle-btn.yes { background: var(--state-done); }
-        .toggle-btn.no { background: var(--primary-red); }
-
-        .btn-save { width: 100%; background: var(--border-color); color: var(--text-muted); border: none; padding: 18px; border-radius: 16px; font-size: 15px; font-weight: bold; letter-spacing: 1px; margin-top: 16px; cursor: pointer; transition: 0.2s; }
-        .btn-save.valid { background: var(--primary-red); color: white; }
-
-        /* Modal Borrar */
-        .dialog { background: #1E1E1E; width: 90%; max-width: 320px; border-radius: 20px; padding: 24px; transform: scale(0.9); transition: transform 0.3s; margin-bottom: auto; margin-top: auto; }
-        .modal-overlay.active .dialog { transform: scale(1); }
-        .dialog h3 { color: white; margin-bottom: 12px; font-size: 18px; }
-        .dialog p { color: var(--text-muted); font-size: 14px; line-height: 1.4; margin-bottom: 24px; }
-        .dialog-actions { display: flex; gap: 12px; justify-content: flex-end; }
-        .dialog-actions button { padding: 12px 20px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; font-size: 14px; }
-        .btn-cancel { background: #2A2A2A; color: white; }
-        .btn-confirm-delete { background: var(--primary-red); color: white; }
+        #loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
+    <body>
+<div id="loading-overlay">
+    <i class="fa-solid fa-circle-notch fa-spin fa-3x" style="color:var(--primary-red); margin-bottom:20px;"></i>
+    <p style="font-weight:bold; letter-spacing:1px;">SINCRONIZANDO DRIVE...</p>
+</div>
 
-<body>
 <div id="app-container">
     <header>
         <div class="logo">SOS</div>
-        <div class="header-actions">
-            <div class="month-selector">
-                <button onclick="toggleAllMonths()" id="btn-toggle-all" title="Ver todo el historial"><i class="fa-solid fa-list-ul"></i></button>
-                
-                <button onclick="changeMonth(-1)" class="month-nav"><i class="fa-solid fa-chevron-left"></i></button>
-                <span id="current-month-display" onclick="resetToCurrentMonth()">Abril 2026</span>
-                <button onclick="changeMonth(1)" class="month-nav"><i class="fa-solid fa-chevron-right"></i></button>
-            </div>
-            <i class="fa-solid fa-download" onclick="alert('Función de exportar en desarrollo')"></i>
-        </div>
+        <button id="auth-btn" onclick="handleAuthClick()">
+            <i class="fa-brands fa-google"></i> <span id="auth-text">CONECTAR DRIVE</span>
+        </button>
     </header>
 
-    <div class="scroll-bar" id="sort-container">
-        <div class="chip chip-sort active" data-sort="FECHA">FECHA ↓</div>
-        <div class="chip chip-sort" data-sort="MONTO">MONTO</div>
-        <div class="chip chip-sort" data-sort="SERVICIO">SERVICIO</div>
+    <div class="month-selector">
+        <button onclick="changeMonth(-1)" class="month-nav"><i class="fa-solid fa-chevron-left"></i></button>
+        <span id="current-month-display">Cargando...</span>
+        <button onclick="changeMonth(1)" class="month-nav"><i class="fa-solid fa-chevron-right"></i></button>
+        <button onclick="toggleAllMonths()" id="btn-all" class="btn-all-history"><i class="fa-solid fa-list-check"></i></button>
     </div>
 
-    <div class="scroll-bar" id="filter-container">
-        <div class="chip chip-filter active" data-filter="Todos">Todos <span class="badge-count" id="c-todos">0</span></div>
-        <div class="chip chip-filter" data-filter="Pendiente">Pendiente <span class="badge-count" id="c-pend">0</span></div>
-        <div class="chip chip-filter" data-filter="En Curso">En Curso <span class="badge-count" id="c-curso">0</span></div>
-        <div class="chip chip-filter" data-filter="Terminado">Terminado <span class="badge-count" id="c-term">0</span></div>
+    <div class="scroll-bar">
+        <div class="chip chip-sort active" id="sort-date" onclick="setSort('FECHA')">FECHA ↓</div>
+        <div class="chip chip-sort" id="sort-amount" onclick="setSort('MONTO')">MONTO</div>
     </div>
 
-    <main id="list-container">
-        </main>
+    <div class="scroll-bar">
+        <div class="chip chip-filter active" id="f-all" onclick="setFilter('Todos')">Todos</div>
+        <div class="chip chip-filter" id="f-pend" onclick="setFilter('Pendiente')">Pendientes</div>
+        <div class="chip chip-filter" id="f-done" onclick="setFilter('Terminado')">Terminados</div>
+    </div>
+
+    <main id="list-container"></main>
 
     <footer>
         <div>
-            <span class="total-label" id="total-label-text">TOTAL DEL MES</span>
+            <span id="total-label" style="color:var(--text-muted); font-size:10px; font-weight:bold; display:block; margin-bottom:4px;">TOTAL MES</span>
             <div class="total-amount" id="total-monto">$0,00</div>
         </div>
         <button class="fab" onclick="openForm()"><i class="fa-solid fa-plus"></i></button>
@@ -188,436 +116,221 @@
 
     <div class="modal-overlay" id="modal-form">
         <div class="bottom-sheet">
-            <div class="sheet-header">
-                <button class="btn-close" onclick="closeForm()"><i class="fa-solid fa-xmark"></i></button>
-                <div class="sheet-title">Nuevo Registro</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+                <button onclick="closeForm()" style="background:var(--input-bg); border:none; color:white; padding:10px; border-radius:12px;"><i class="fa-solid fa-xmark"></i></button>
+                <h2 style="font-size:18px;">Nuevo Registro</h2>
+                <div style="width:40px;"></div>
             </div>
-            <div class="sheet-body">
-                <input type="hidden" id="f-id">
-                
-                <div class="input-group">
-                    <label>FECHA (AAAA-MM-DD)</label>
-                    <input type="date" id="f-fecha">
-                </div>
-                
-                <div class="row">
-                    <div class="input-group">
-                        <label>SERVICIO N</label>
-                        <input type="number" id="f-servicio" placeholder="Ej: 138686">
-                    </div>
-                    <div class="input-group">
-                        <label>MONTO ($)</label>
-                        <input type="number" step="0.01" id="f-monto" placeholder="0.00">
-                    </div>
-                </div>
-
-                <div class="input-group">
-                    <label>VEHICULO</label>
-                    <input type="text" id="f-vehiculo" placeholder="Ej: Hilux">
-                </div>
-                <div class="input-group">
-                    <label>PATENTE</label>
-                    <input type="text" id="f-patente" placeholder="ABC123">
-                </div>
-                <div class="input-group">
-                    <label>KM</label>
-                    <input type="number" id="f-km" placeholder="0">
-                </div>
-                <div class="input-group">
-                    <label>MOTIVO</label>
-                    <input type="text" id="f-motivo" placeholder="Mantenimiento">
-                </div>
-
-                <label style="color: var(--text-muted); font-size: 12px; font-weight: bold; letter-spacing: 1px; display:block; margin-bottom: 8px;">ESTADO</label>
-                <div class="estado-selector">
-                    <div class="estado-btn active" onclick="setEstado('Pendiente')" id="btn-est-pend">Pendiente</div>
-                    <div class="estado-btn" onclick="setEstado('En Curso')" id="btn-est-curso">En Curso</div>
-                    <div class="estado-btn" onclick="setEstado('Terminado')" id="btn-est-term">Terminado</div>
-                </div>
-
-                <div class="toggle-row">
-                    <span class="toggle-label">Consiliado</span>
-                    <div class="toggle-btn no" id="btn-consiliado" onclick="toggleBoolean('consiliado')">NO</div>
-                </div>
-                <div class="toggle-row">
-                    <span class="toggle-label">Cobrado</span>
-                    <div class="toggle-btn no" id="btn-cobrado" onclick="toggleBoolean('cobrado')">NO</div>
-                </div>
-
-                <button class="btn-save valid" onclick="saveRecord()">✓ GUARDAR REGISTRO</button>
+            
+            <input type="hidden" id="f-id">
+            <div class="input-group"><label>FECHA DEL SERVICIO</label><input type="date" id="f-fecha"></div>
+            <div style="display:flex; gap:15px;">
+                <div class="input-group" style="flex:1;"><label>SERVICIO #</label><input type="number" id="f-servicio" placeholder="0000"></div>
+                <div class="input-group" style="flex:1;"><label>MONTO ($)</label><input type="number" step="0.01" id="f-monto" placeholder="0.00"></div>
             </div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="modal-delete">
-        <div class="dialog">
-            <h3>Borrar registro</h3>
-            <p id="delete-text">Servicio #123 de ABC. Esta accion no se puede deshacer.</p>
-            <div class="dialog-actions">
-                <button class="btn-cancel" onclick="closeDelete()">CANCELAR</button>
-                <button class="btn-confirm-delete" onclick="confirmDelete()">BORRAR</button>
+            <div class="input-group"><label>PATENTE / VEHÍCULO</label><input type="text" id="f-patente" placeholder="ABC-123"></div>
+            <div class="input-group"><label>DETALLE / MOTIVO</label><input type="text" id="f-motivo" placeholder="Ej: Cambio de aceite"></div>
+            <div class="input-group">
+                <label>ESTADO ACTUAL</label>
+                <select id="f-estado">
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="En Curso">En Curso</option>
+                    <option value="Terminado">Terminado</option>
+                </select>
             </div>
+            <button class="fab" style="width:100%; margin-top:10px; font-size:16px; font-weight:bold;" onclick="saveRecord()">✓ GUARDAR REGISTRO</button>
+            <button id="btn-del" style="width:100%; margin-top:15px; background:none; border:none; color:var(--state-pend); font-weight:bold; display:none;" onclick="deleteRecord()">BORRAR REGISTRO</button>
         </div>
     </div>
 </div>
 
+        <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+<script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
+
 <script>
-    // --- ESTADO DE LA APLICACIÓN ---
-    let records = JSON.parse(localStorage.getItem('sos_records')) || [];
-    let currentFilter = 'Todos';
-    let sortBy = 'FECHA';
-    let sortAscending = false;
-    let showAllMonths = false; // Nueva variable para controlar si mostramos todo
-    
-    // Función segura para obtener la fecha de hoy YYYY-MM-DD
-    const getTodayYMD = () => {
-        const d = new Date();
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    };
+    // --- CONFIGURACIÓN ---
+    const API_KEY = 'AIzaSyCg2T_OVIV0C6Lmx-JCmV67nLiQDAwqbss';
+    const CLIENT_ID = 'TU_CLIENT_ID_AQUI.apps.googleusercontent.com'; // <--- PEGA TU CLIENT ID ACÁ
+    const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
+    const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
-    // Filtro de mes arranca en el mes actual ("YYYY-MM")
-    let currentMonthFilter = getTodayYMD().substring(0, 7); 
+    let tokenClient, gapiInited = false, gisInited = false, driveFileId = null;
+    let records = [], currentFilter = 'Todos', sortBy = 'FECHA', sortAsc = false, showAll = false;
+    let currentMonth = new Date().toISOString().substring(0, 7);
 
-    // Variables Temporales de Formulario
-    let formEstado = 'Pendiente';
-    let formConsiliado = false;
-    let formCobrado = false;
-    let recordToDeleteId = null;
+    // --- INICIO DE GOOGLE ---
+    function gapiLoaded() { gapi.load('client', async () => { await gapi.client.init({apiKey: API_KEY, discoveryDocs: [DISCOVERY_DOC]}); gapiInited = true; checkAuth(); }); }
+    function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({client_id: CLIENT_ID, scope: SCOPES, callback: ''}); gisInited = true; }
 
-    // --- FORMATEADORES ---
-    const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(amount);
-    };
+    async function checkAuth() {
+        const t = localStorage.getItem('g_token');
+        if(t) { gapi.client.setToken({access_token: t}); updateUIAuth(true); sync(); } else { render(); }
+    }
 
-    const formatDateStr = (dateString) => {
-        if(!dateString) return '';
-        const parts = dateString.split('-');
-        if(parts.length !== 3) return dateString;
-        return `${parts[2]}/${parts[1]}/${parts[0]}`;
-    };
+    function handleAuthClick() {
+        tokenClient.callback = async (r) => { 
+            if(r.error) return;
+            localStorage.setItem('g_token', r.access_token); 
+            updateUIAuth(true); 
+            sync(); 
+        };
+        tokenClient.requestAccessToken({prompt: gapi.client.getToken() ? '' : 'consent'});
+    }
 
-    const getMonthName = (periodoMes) => {
-        if (!periodoMes) return '';
-        const parts = periodoMes.split('-');
-        if (parts.length !== 2) return periodoMes;
-        const year = parts[0];
-        const monthIndex = parseInt(parts[1], 10) - 1;
-        const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-        return `${months[monthIndex]} ${year}`;
-    };
+    function updateUIAuth(s) { 
+        const btn = document.getElementById('auth-btn');
+        if(s) { btn.classList.add('logged-in'); document.getElementById('auth-text').innerText = 'EN LA NUBE'; } 
+    }
 
-    const generateId = () => '_' + Math.random().toString(36).substr(2, 9);
+    // --- BASE DE DATOS DRIVE ---
+    async function sync() {
+        document.getElementById('loading-overlay').style.display = 'flex';
+        try {
+            const res = await gapi.client.drive.files.list({ q: "name = 'sos_database.json' and trashed = false" });
+            const files = res.result.files;
+            if(files.length > 0) {
+                driveFileId = files[0].id;
+                const content = await gapi.client.drive.files.get({ fileId: driveFileId, alt: 'media' });
+                records = content.result || [];
+            } else {
+                const meta = { name: 'sos_database.json', mimeType: 'application/json' };
+                const file = await gapi.client.drive.files.create({ resource: meta, fields: 'id' });
+                driveFileId = file.result.id;
+            }
+            render();
+        } catch(e) { console.error(e); }
+        document.getElementById('loading-overlay').style.display = 'none';
+    }
 
-    // --- RENDERIZADO PRINCIPAL ---
-    const renderApp = () => {
-        const btnToggleAll = document.getElementById('btn-toggle-all');
-        const monthNavs = document.querySelectorAll('.month-nav');
-        const monthDisplay = document.getElementById('current-month-display');
-        const totalLabel = document.getElementById('total-label-text');
+    async function saveToDrive() {
+        if(!driveFileId || !gapi.client.getToken()) return;
+        await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
+            method: 'PATCH', 
+            headers: { 'Authorization': `Bearer ${gapi.client.getToken().access_token}` }, 
+            body: JSON.stringify(records)
+        });
+    }
 
-        // Adaptar la interfaz dependiendo si mostramos todo o un solo mes
-        if (showAllMonths) {
-            monthDisplay.innerText = "Historial Completo";
-            monthNavs.forEach(el => el.style.display = 'none');
-            btnToggleAll.style.color = "var(--primary-red)";
-            totalLabel.innerText = "TOTAL ACUMULADO";
-        } else {
-            monthDisplay.innerText = getMonthName(currentMonthFilter);
-            monthNavs.forEach(el => el.style.display = 'flex');
-            btnToggleAll.style.color = "var(--text-muted)";
-            totalLabel.innerText = "TOTAL DEL MES";
+    // --- LÓGICA DE LA APP ---
+    function render() {
+        const display = document.getElementById('current-month-display');
+        const navs = document.querySelectorAll('.month-nav');
+        const label = document.getElementById('total-label');
+        const btnAll = document.getElementById('btn-all');
+        
+        if(showAll) { 
+            display.innerText = "Historial Completo"; 
+            navs.forEach(n => n.style.display='none'); 
+            label.innerText = "TOTAL ACUMULADO";
+            btnAll.classList.add('active');
+        } else { 
+            display.innerText = currentMonth; 
+            navs.forEach(n => n.style.display='block'); 
+            label.innerText = "TOTAL DEL MES";
+            btnAll.classList.remove('active');
         }
 
-        // 1. Filtrar por MES o Traer Todo
-        let recordsTarget = showAllMonths 
-            ? records 
-            : records.filter(r => r.fecha.startsWith(currentMonthFilter));
+        let filtered = showAll ? records : records.filter(r => r.fecha.startsWith(currentMonth));
+        if(currentFilter !== 'Todos') filtered = filtered.filter(r => r.estado === currentFilter);
 
-        // 2. Filtrar por ESTADO (sobre los registros seleccionados)
-        let filtered = recordsTarget;
-        if (currentFilter !== 'Todos') {
-            filtered = recordsTarget.filter(r => r.estado === currentFilter);
-        }
-
-        // 3. Ordenar
-        filtered.sort((a, b) => {
-            let res = 0;
-            if (sortBy === 'FECHA') {
-                res = a.fecha.localeCompare(b.fecha);
-            } else if (sortBy === 'MONTO') {
-                res = parseFloat(a.monto) - parseFloat(b.monto);
-            } else {
-                res = parseInt(a.servicio) - parseInt(b.servicio);
-            }
-            return sortAscending ? res : -res;
+        filtered.sort((a,b) => {
+            let res = sortBy === 'FECHA' ? a.fecha.localeCompare(b.fecha) : parseFloat(a.monto) - parseFloat(b.monto);
+            return sortAsc ? res : -res;
         });
 
-        // Actualizar UI
-        updateCounters(recordsTarget);
-        updateSortChips();
-        renderList(filtered);
-        
-        // Actualizar Total (Suma de los filtrados actualmente en pantalla)
-        const total = filtered.reduce((sum, r) => sum + parseFloat(r.monto || 0), 0);
-        document.getElementById('total-monto').innerText = formatCurrency(total);
-        
-        // Guardar en Storage
-        localStorage.setItem('sos_records', JSON.stringify(records));
-    };
-
-    const updateCounters = (baseRecords) => {
-        document.getElementById('c-todos').innerText = baseRecords.length;
-        document.getElementById('c-pend').innerText = baseRecords.filter(r => r.estado === 'Pendiente').length;
-        document.getElementById('c-curso').innerText = baseRecords.filter(r => r.estado === 'En Curso').length;
-        document.getElementById('c-term').innerText = baseRecords.filter(r => r.estado === 'Terminado').length;
-
-        document.querySelectorAll('.chip-filter').forEach(chip => {
-            if(chip.dataset.filter === currentFilter) chip.classList.add('active');
-            else chip.classList.remove('active');
-        });
-    };
-
-    const updateSortChips = () => {
-        document.querySelectorAll('.chip-sort').forEach(chip => {
-            if(chip.dataset.sort === sortBy) {
-                chip.classList.add('active');
-                chip.innerText = `${sortBy} ${sortAscending ? '↑' : '↓'}`;
-            } else {
-                chip.classList.remove('active');
-                chip.innerText = chip.dataset.sort;
-            }
-        });
-    };
-
-    const renderList = (filteredRecords) => {
         const container = document.getElementById('list-container');
+        container.innerHTML = filtered.length ? '' : '<div style="text-align:center; margin-top:50px; color:gray;"><i class="fa-solid fa-folder-open fa-3x"></i><p style="margin-top:10px;">No hay registros</p></div>';
         
-        if (filteredRecords.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <i class="fa-solid fa-inbox"></i>
-                    <h3>Sin registros</h3>
-                    <p>${showAllMonths ? 'No hay ningún servicio registrado.' : 'No hay servicios en este mes.'}</p>
+        filtered.forEach(r => {
+            const color = r.estado === 'Terminado' ? 'var(--state-done)' : (r.estado === 'En Curso' ? 'var(--state-prog)' : 'var(--state-pend)');
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.innerHTML = `
+                <div class="card-border" style="background:${color}"></div>
+                <div class="card-content" onclick="openForm('${r.id}')">
+                    <div class="card-header"><span class="card-id">#${r.servicio}</span><span class="card-price">$${parseFloat(r.monto).toLocaleString()}</span></div>
+                    <div class="card-info"><i class="fa-solid fa-calendar-day"></i> ${r.fecha.split('-').reverse().join('/')} <i class="fa-solid fa-car"></i> ${r.patente}</div>
+                    <div style="font-size:12px; color:var(--text-muted); font-style:italic;">${r.motivo || ''}</div>
                 </div>
             `;
-            return;
-        }
-
-        container.innerHTML = '';
-        filteredRecords.forEach(r => {
-            let borderColor = 'var(--state-pend)';
-            if(r.estado === 'En Curso') borderColor = 'var(--state-prog)';
-            if(r.estado === 'Terminado') borderColor = 'var(--state-done)';
-
-            const badgeEstado = `<div class="text-badge" style="background: rgba(245,158,11,0.1); color: var(--badge-yellow);">${r.estado.toUpperCase()}</div>`;
-            const consColor = r.consiliado ? 'var(--state-done)' : 'var(--state-pend)';
-            const badgeCons = `<div class="text-badge" style="background: ${r.consiliado ? 'rgba(16,185,129,0.1)' : 'rgba(220,38,38,0.1)'}; color: ${consColor};">${r.consiliado ? 'CONSIL.' : 'NO CONSIL.'}</div>`;
-            const cobColor = r.cobrado ? 'var(--state-done)' : 'var(--state-pend)';
-            const badgeCob = `<div class="text-badge" style="background: ${r.cobrado ? 'rgba(16,185,129,0.1)' : 'rgba(220,38,38,0.1)'}; color: ${cobColor};">${r.cobrado ? 'COBRADO' : 'NO COBRADO'}</div>`;
-
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <div class="card-border" style="background-color: ${borderColor}"></div>
-                <div class="card-content">
-                    <div class="card-header">
-                        <div style="display:flex; align-items:center;">
-                            <span class="card-id">#${r.servicio}</span>
-                            <span class="card-date">${formatDateStr(r.fecha)}</span>
-                        </div>
-                        <span class="card-price">${formatCurrency(r.monto)}</span>
-                    </div>
-                    
-                    <div class="card-info">
-                        <i class="fa-solid fa-truck"></i> <span>${r.vehiculo || 'S/V'}</span>
-                        <i class="fa-solid fa-hashtag" style="margin-left:8px;"></i> <span>${r.patente ? r.patente.toUpperCase() : 'S/P'}</span>
-                        <i class="fa-solid fa-location-arrow" style="margin-left:8px;"></i> <span>${r.km || 0} km</span>
-                    </div>
-                    
-                    ${r.motivo ? `<div class="card-motivo">${r.motivo}</div>` : ''}
-                    
-                    <div class="card-footer">
-                        <div class="badges-container">
-                            ${badgeEstado}
-                            ${badgeCons}
-                            ${badgeCob}
-                        </div>
-                        <div class="card-actions">
-                            <div class="btn-icon" style="color: var(--badge-yellow);" onclick="openForm('${r.id}')"><i class="fa-solid fa-pen"></i></div>
-                            <div class="btn-icon" style="color: var(--primary-red);" onclick="openDelete('${r.id}')"><i class="fa-regular fa-trash-can"></i></div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            container.appendChild(card);
+            container.appendChild(div);
         });
-    };
 
-    // --- EVENTOS DE NAVEGACIÓN Y TOGGLE ---
-    const toggleAllMonths = () => {
-        showAllMonths = !showAllMonths;
-        renderApp();
-    };
+        const total = filtered.reduce((s, r) => s + parseFloat(r.monto || 0), 0);
+        document.getElementById('total-monto').innerText = '$' + total.toLocaleString('es-AR', {minimumFractionDigits: 2});
+    }
 
-    const changeMonth = (delta) => {
-        if (showAllMonths) return; // Si está en "Todos", no hace nada
-        let [year, month] = currentMonthFilter.split('-').map(Number);
-        month += delta;
-        
-        if (month === 0) { month = 12; year--; }
-        else if (month === 13) { month = 1; year++; }
-        
-        currentMonthFilter = `${year}-${String(month).padStart(2, '0')}`;
-        renderApp();
-    };
+    function toggleAllMonths() { showAll = !showAll; render(); }
+    function changeMonth(d) {
+        let [y, m] = currentMonth.split('-').map(Number);
+        m += d; if(m>12){m=1;y++} else if(m<1){m=12;y--}
+        currentMonth = `${y}-${String(m).padStart(2,'0')}`; render();
+    }
+    function setFilter(f) { 
+        currentFilter = f; 
+        document.querySelectorAll('.chip-filter').forEach(c => c.classList.remove('active'));
+        if(f==='Todos') document.getElementById('f-all').classList.add('active');
+        if(f==='Pendiente') document.getElementById('f-pend').classList.add('active');
+        if(f==='Terminado') document.getElementById('f-done').classList.add('active');
+        render(); 
+    }
+    function setSort(s) { 
+        if(sortBy === s) sortAsc = !sortAsc; else { sortBy = s; sortAsc = false; } 
+        document.querySelectorAll('.chip-sort').forEach(c => c.classList.remove('active'));
+        const btn = s === 'FECHA' ? document.getElementById('sort-date') : document.getElementById('sort-amount');
+        btn.classList.add('active');
+        btn.innerText = s + (sortAsc ? ' ↑' : ' ↓');
+        render(); 
+    }
 
-    const resetToCurrentMonth = () => {
-        if (showAllMonths) return;
-        currentMonthFilter = getTodayYMD().substring(0, 7);
-        renderApp();
-    };
-
-    // --- EVENTOS DE FILTROS ---
-    document.querySelectorAll('.chip-filter').forEach(chip => {
-        chip.addEventListener('click', (e) => {
-            currentFilter = e.currentTarget.dataset.filter;
-            renderApp();
-        });
-    });
-
-    document.querySelectorAll('.chip-sort').forEach(chip => {
-        chip.addEventListener('click', (e) => {
-            const clickedSort = e.currentTarget.dataset.sort;
-            if (sortBy === clickedSort) {
-                sortAscending = !sortAscending;
-            } else {
-                sortBy = clickedSort;
-                sortAscending = clickedSort !== 'FECHA';
-            }
-            renderApp();
-        });
-    });
-
-    // --- LÓGICA DE FORMULARIO ---
-    const openForm = (id = null) => {
-        document.querySelector('.sheet-title').innerText = id ? 'Editar Registro' : 'Nuevo Registro';
-        
-        if (id) {
+    function openForm(id = null) {
+        document.getElementById('btn-del').style.display = id ? 'block' : 'none';
+        if(id) {
             const r = records.find(x => x.id === id);
             document.getElementById('f-id').value = r.id;
             document.getElementById('f-fecha').value = r.fecha;
             document.getElementById('f-servicio').value = r.servicio;
             document.getElementById('f-monto').value = r.monto;
-            document.getElementById('f-vehiculo').value = r.vehiculo;
             document.getElementById('f-patente').value = r.patente;
-            document.getElementById('f-km').value = r.km;
             document.getElementById('f-motivo').value = r.motivo;
-            setEstado(r.estado);
-            formConsiliado = r.consiliado;
-            formCobrado = r.cobrado;
+            document.getElementById('f-estado').value = r.estado;
         } else {
             document.getElementById('f-id').value = '';
-            document.getElementById('f-fecha').value = getTodayYMD();
+            document.getElementById('f-fecha').value = new Date().toISOString().substring(0,10);
             document.getElementById('f-servicio').value = '';
             document.getElementById('f-monto').value = '';
-            document.getElementById('f-vehiculo').value = '';
             document.getElementById('f-patente').value = '';
-            document.getElementById('f-km').value = '';
             document.getElementById('f-motivo').value = '';
-            setEstado('Pendiente');
-            formConsiliado = false;
-            formCobrado = false;
+            document.getElementById('f-estado').value = 'Pendiente';
         }
-        
-        updateToggleUI('consiliado', formConsiliado);
-        updateToggleUI('cobrado', formCobrado);
         document.getElementById('modal-form').classList.add('active');
-    };
+    }
 
-    const closeForm = () => document.getElementById('modal-form').classList.remove('active');
+    function closeForm() { document.getElementById('modal-form').classList.remove('active'); }
 
-    const setEstado = (est) => {
-        formEstado = est;
-        ['pend', 'curso', 'term'].forEach(e => document.getElementById(`btn-est-${e}`).classList.remove('active'));
-        if(est === 'Pendiente') document.getElementById('btn-est-pend').classList.add('active');
-        if(est === 'En Curso') document.getElementById('btn-est-curso').classList.add('active');
-        if(est === 'Terminado') document.getElementById('btn-est-term').classList.add('active');
-    };
-
-    const toggleBoolean = (type) => {
-        if(type === 'consiliado') formConsiliado = !formConsiliado;
-        else formCobrado = !formCobrado;
-        updateToggleUI(type, type === 'consiliado' ? formConsiliado : formCobrado);
-    };
-
-    const updateToggleUI = (type, val) => {
-        const btn = document.getElementById(`btn-${type}`);
-        if(val) {
-            btn.classList.replace('no', 'yes');
-            btn.innerText = 'SI';
-        } else {
-            btn.classList.replace('yes', 'no');
-            btn.innerText = 'NO';
-        }
-    };
-
-    const saveRecord = () => {
+    async function saveRecord() {
         const id = document.getElementById('f-id').value;
-        const newRecord = {
-            id: id || generateId(),
-            fecha: document.getElementById('f-fecha').value || getTodayYMD(),
+        const data = {
+            id: id || Math.random().toString(36).substr(2, 9),
+            fecha: document.getElementById('f-fecha').value,
             servicio: document.getElementById('f-servicio').value || '0',
-            monto: document.getElementById('f-monto').value || '0',
-            vehiculo: document.getElementById('f-vehiculo').value,
+            monto: document.getElementById('f-monto').value || 0,
             patente: document.getElementById('f-patente').value.toUpperCase(),
-            km: document.getElementById('f-km').value || '0',
             motivo: document.getElementById('f-motivo').value,
-            estado: formEstado,
-            consiliado: formConsiliado,
-            cobrado: formCobrado
+            estado: document.getElementById('f-estado').value
         };
+        if(id) records = records.map(r => r.id === id ? data : r);
+        else records.push(data);
+        closeForm(); render(); saveToDrive();
+    }
 
-        if (id) {
-            const index = records.findIndex(r => r.id === id);
-            if (index !== -1) records[index] = newRecord;
-        } else {
-            records.push(newRecord);
-            // Si agrega un registro nuevo y no está viendo "Todos", lo llevamos al mes de ese registro
-            if (!showAllMonths) {
-                currentMonthFilter = newRecord.fecha.substring(0, 7);
-            }
-        }
-
-        closeForm();
-        renderApp();
-    };
-
-    // --- LÓGICA DE BORRADO ---
-    const openDelete = (id) => {
-        recordToDeleteId = id;
-        const r = records.find(x => x.id === id);
-        document.getElementById('delete-text').innerText = `Servicio #${r.servicio} de ${r.patente ? r.patente.toUpperCase() : 'este vehículo'}. Esta accion no se puede deshacer.`;
-        document.getElementById('modal-delete').classList.add('active');
-    };
-
-    const closeDelete = () => {
-        recordToDeleteId = null;
-        document.getElementById('modal-delete').classList.remove('active');
-    };
-
-    const confirmDelete = () => {
-        if (recordToDeleteId) {
-            records = records.filter(r => r.id !== recordToDeleteId);
-            closeDelete();
-            renderApp();
-        }
-    };
-
-    // INICIAR APP
-    renderApp();
+    async function deleteRecord() {
+        if(!confirm('¿Seguro querés borrar esto?')) return;
+        const id = document.getElementById('f-id').value;
+        records = records.filter(r => r.id !== id);
+        closeForm(); render(); saveToDrive();
+    }
 </script>
 </body>
 </html>
+,

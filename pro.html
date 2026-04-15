@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SOS App Pro - Analytics</title>
+    <title>SOS App Pro - Red SOS</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <script src="https://apis.google.com/js/api.js"></script>
     <script src="https://accounts.google.com/gsi/client"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -21,9 +20,22 @@
 <div id="app-container">
     <header>
         <div class="logo">RED<span>SOS</span></div>
-        <button id="auth-btn" onclick="handleAuthClick()">
-            <i class="fa-brands fa-google"></i> <span id="auth-text">CARGANDO...</span>
-        </button>
+        <div class="header-actions">
+            <button id="auth-btn" onclick="handleAuthClick()">
+                <i class="fa-brands fa-google"></i> <span id="auth-text">...</span>
+            </button>
+            <button id="menu-btn" onclick="toggleMenu()">
+                <i class="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+        </div>
+
+        <div class="dropdown-menu" id="main-menu">
+            <button onclick="openDashboard(); toggleMenu()"><i class="fa-solid fa-chart-pie"></i> Reportes Analíticos</button>
+            <button onclick="exportToCSV(); toggleMenu()"><i class="fa-solid fa-file-csv"></i> Exportar a Excel</button>
+            <button onclick="exportBackup(); toggleMenu()"><i class="fa-solid fa-download"></i> Descargar Backup</button>
+            <button onclick="document.getElementById('file-import').click(); toggleMenu()"><i class="fa-solid fa-upload"></i> Importar Datos</button>
+        </div>
+        <input type="file" id="file-import" style="display:none" accept=".json" onchange="importBackup(event)">
     </header>
 
     <div class="search-container">
@@ -31,14 +43,6 @@
             <i class="fa-solid fa-magnifying-glass"></i>
             <input type="text" id="main-search" placeholder="Buscar patente, vehículo o N°..." oninput="render()">
         </div>
-    </div>
-
-    <div class="actions-row">
-        <button class="btn-action btn-stats" onclick="openDashboard()"><i class="fa-solid fa-chart-pie"></i> Reportes</button>
-        <button class="btn-action" onclick="exportToCSV()"><i class="fa-solid fa-file-csv"></i> Excel</button>
-        <button class="btn-action" onclick="exportBackup()"><i class="fa-solid fa-download"></i> Backup</button>
-        <button class="btn-action" onclick="document.getElementById('file-import').click()"><i class="fa-solid fa-upload"></i> Importar</button>
-        <input type="file" id="file-import" style="display:none" accept=".json" onchange="importBackup(event)">
     </div>
 
     <div class="stats-row">
@@ -52,21 +56,15 @@
         </div>
     </div>
 
-    <div class="time-bar">
-        <button id="btn-toggle-all" onclick="toggleAllMonths()">
-            <i class="fa-solid fa-list-ul"></i>
-        </button>
+    <div class="controls-row">
         <div class="month-nav">
             <button onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-            <span id="current-month-display">---</span>
+            <span id="current-month-display" onclick="toggleAllMonths()">---</span>
             <button onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
         </div>
-    </div>
-
-    <div class="scroll-bar">
-        <div class="chip chip-sort active" id="sort-FECHA" onclick="setSort('FECHA')">FECHA ↓</div>
-        <div class="chip chip-sort" id="sort-MONTO" onclick="setSort('MONTO')">MONTO</div>
-        <div class="chip chip-sort" id="sort-SERVICIO" onclick="setSort('SERVICIO')">N°</div>
+        <button class="btn-filter" onclick="openFilters()">
+            <i class="fa-solid fa-sliders"></i> Filtros
+        </button>
     </div>
 
     <main id="list-container"></main>
@@ -81,6 +79,30 @@
         </button>
     </footer>
 
+    <div class="modal-overlay" id="modal-filtros">
+        <div class="bottom-sheet" style="height: auto; min-height: 40%;">
+            <div class="sheet-header">
+                <button class="btn-close" onclick="closeFilters()"><i class="fa-solid fa-xmark"></i></button>
+                <div class="sheet-title">ORDENAR Y FILTRAR</div>
+            </div>
+            <div class="sheet-body">
+                <label class="filter-label">ORDENAR POR:</label>
+                <div class="scroll-bar" style="margin-bottom: 25px;">
+                    <div class="chip chip-sort active" id="sort-FECHA" onclick="setSort('FECHA')">FECHA ↓</div>
+                    <div class="chip chip-sort" id="sort-MONTO" onclick="setSort('MONTO')">MONTO</div>
+                    <div class="chip chip-sort" id="sort-SERVICIO" onclick="setSort('SERVICIO')">N°</div>
+                </div>
+
+                <label class="filter-label">VER ESTADO:</label>
+                <div class="scroll-bar">
+                    <div class="chip chip-filter active" id="f-Todos" onclick="setFilter('Todos')">Todos <span class="badge" id="c-Todos">0</span></div>
+                    <div class="chip chip-filter" id="f-Pendiente" onclick="setFilter('Pendiente')">Pend. <span class="badge" id="c-Pendiente">0</span></div>
+                    <div class="chip chip-filter" id="f-Terminado" onclick="setFilter('Terminado')">Term. <span class="badge" id="c-Terminado">0</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="modal-dashboard">
         <div class="bottom-sheet full-height">
             <div class="sheet-header">
@@ -89,25 +111,11 @@
             </div>
             <div class="sheet-body">
                 <div class="analytics-grid">
-                    <div class="metric-mini">
-                        <span class="m-label">TICKET PROMEDIO</span>
-                        <span class="m-value" id="dash-promedio">$0</span>
-                    </div>
-                    <div class="metric-mini">
-                        <span class="m-label">TOP VEHÍCULO</span>
-                        <span class="m-value" id="dash-top-v">-</span>
-                    </div>
+                    <div class="metric-mini"><span class="m-label">TICKET PROMEDIO</span><span class="m-value" id="dash-promedio">$0</span></div>
+                    <div class="metric-mini"><span class="m-label">TOP VEHÍCULO</span><span class="m-value" id="dash-top-v">-</span></div>
                 </div>
-
-                <div class="chart-box">
-                    <h3>FACTURACIÓN MENSUAL</h3>
-                    <canvas id="chart-billing"></canvas>
-                </div>
-
-                <div class="chart-box">
-                    <h3>ESTADO DE COBROS (%)</h3>
-                    <canvas id="chart-status"></canvas>
-                </div>
+                <div class="chart-box"><h3>FACTURACIÓN MENSUAL</h3><canvas id="chart-billing"></canvas></div>
+                <div class="chart-box"><h3>ESTADO DE COBROS</h3><canvas id="chart-status"></canvas></div>
             </div>
         </div>
     </div>
@@ -127,9 +135,9 @@
                 </div>
                 <div class="row-inputs">
                     <div class="input-group"><label>PATENTE</label><input type="text" id="f-patente"></div>
-                    <div class="input-group"><label>KM</label><input type="number" id="f-km"></div>
+                    <div class="input-group"><label>KM</label><input type="number" id="f-km" placeholder="0"></div>
                 </div>
-                <div class="input-group"><label>VEHÍCULO</label><input type="text" id="f-vehiculo"></div>
+                <div class="input-group"><label>VEHÍCULO (MARCA/MODELO)</label><input type="text" id="f-vehiculo"></div>
                 <div class="input-group"><label>MOTIVO / DETALLE</label><input type="text" id="f-motivo"></div>
                 <div class="input-group">
                     <label>ESTADO</label>
@@ -150,6 +158,7 @@
     <div class="modal-overlay" id="modal-confirm">
         <div class="confirm-box">
             <h3>¿ELIMINAR?</h3>
+            <p>Esta acción no se puede deshacer.</p>
             <div class="confirm-actions">
                 <button class="btn-cancel" onclick="closeConfirm()">NO</button>
                 <button class="btn-confirm-del" onclick="confirmDelete()">SÍ</button>
@@ -157,79 +166,121 @@
         </div>
     </div>
 </div>
-<style>
-    :root {
-        --bg: #000; --card: #111; --input: #1a1a1a; --border: #262626;
-        --red: #e11d48; --blue: #3b82f6; --green: #10b981; --text: #fff; --gray: #71717a;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; -webkit-tap-highlight-color: transparent; }
 
+<style>
+    :root { --bg: #000; --card: #111; --input: #1a1a1a; --border: #262626; --red: #e11d48; --blue: #3b82f6; --green: #10b981; --gray: #71717a; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background: #000; color: #fff; height: 100dvh; overflow: hidden; display: flex; justify-content: center; }
     #app-container { width: 100%; max-width: 500px; height: 100%; display: flex; flex-direction: column; position: relative; }
 
-    header { padding: 30px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
+    /* HEADER Y MENÚ DESPLEGABLE */
+    header { padding: 30px 20px 10px; display: flex; justify-content: space-between; align-items: center; position: relative; }
     .logo { color: #fff; font-size: 28px; font-weight: 900; letter-spacing: -1px; }
     .logo span { color: var(--red); }
-
-    #auth-btn { background: var(--input); border: 1px solid var(--border); color: #fff; padding: 10px 15px; border-radius: 12px; font-size: 10px; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+    .header-actions { display: flex; gap: 10px; align-items: center; }
+    #auth-btn { background: var(--input); border: 1px solid var(--border); color: #fff; padding: 8px 12px; border-radius: 12px; font-size: 10px; font-weight: 900; display: flex; align-items: center; gap: 6px; }
     #auth-btn.logged-in { border-color: var(--green); color: var(--green); }
+    #menu-btn { background: transparent; border: none; color: #fff; font-size: 20px; padding: 5px; cursor: pointer; }
+    
+    .dropdown-menu { position: absolute; top: 75px; right: 20px; background: var(--card); border: 1px solid var(--border); border-radius: 15px; padding: 10px; display: none; flex-direction: column; gap: 5px; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.9); }
+    .dropdown-menu.active { display: flex; }
+    .dropdown-menu button { background: transparent; border: none; color: #fff; padding: 12px 15px; text-align: left; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 12px; border-radius: 8px; cursor: pointer; }
+    .dropdown-menu button:hover { background: var(--input); }
+    .dropdown-menu i { color: var(--gray); font-size: 16px; }
 
+    /* CONTROLES PRINCIPALES */
     .search-container { padding: 10px 20px; }
     .search-box { background: var(--input); border: 1px solid var(--border); border-radius: 15px; padding: 12px 15px; display: flex; align-items: center; gap: 10px; }
     .search-box input { background: transparent; border: none; color: #fff; outline: none; width: 100%; font-size: 14px; }
-
-    .actions-row { display: flex; gap: 8px; padding: 0 20px 10px; overflow-x: auto; scrollbar-width: none; }
-    .btn-action { background: var(--input); border: 1px solid var(--border); color: var(--gray); padding: 10px 15px; border-radius: 12px; font-size: 11px; font-weight: 900; white-space: nowrap; display: flex; align-items: center; gap: 6px; cursor: pointer; }
-    .btn-stats { border-color: var(--blue); color: var(--blue); }
+    .search-box i { color: var(--gray); }
 
     .stats-row { display: flex; gap: 10px; padding: 5px 20px 10px; }
     .stat-card { flex: 1; background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 20px; text-align: center; }
-    .stat-label { display: block; color: var(--gray); font-size: 9px; font-weight: 900; margin-bottom: 5px; }
+    .stat-label { display: block; color: var(--gray); font-size: 9px; font-weight: 900; margin-bottom: 5px; letter-spacing: 1px; }
     .stat-value { font-size: 18px; font-weight: 900; }
     .stat-value.red { color: var(--red); }
     .stat-value.green { color: var(--green); }
 
-    /* DASHBOARD ESPECÍFICO */
+    /* NUEVA BARRA DE FECHA Y FILTROS */
+    .controls-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 20px 10px; gap: 10px; }
+    .month-nav { flex: 1; background: var(--input); border: 1px solid var(--border); border-radius: 14px; display: flex; justify-content: space-between; align-items: center; padding: 5px; }
+    .month-nav button { background: transparent; border: none; color: var(--gray); padding: 10px; font-size: 16px; cursor: pointer; }
+    #current-month-display { font-size: 13px; font-weight: 900; color: #fff; cursor: pointer; text-align: center; flex: 1; }
+    .btn-filter { background: #fff; border: none; color: #000; padding: 0 18px; height: 42px; border-radius: 14px; font-weight: 900; font-size: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+
+    /* CHIPS ADENTRO DEL MODAL */
+    .filter-label { display: block; color: var(--gray); font-size: 10px; font-weight: 900; margin-bottom: 8px; letter-spacing: 1px; }
+    .scroll-bar { display: flex; overflow-x: auto; gap: 8px; scrollbar-width: none; }
+    .scroll-bar::-webkit-scrollbar { display: none; }
+    .chip { padding: 12px 18px; border-radius: 14px; font-size: 12px; font-weight: bold; background: var(--card); border: 1px solid var(--border); color: var(--gray); white-space: nowrap; cursor: pointer; }
+    .chip.active { background: var(--red); color: #fff; border-color: var(--red); }
+    .chip-sort.active { background: #fff; color: #000; border-color: #fff; }
+    .badge { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 6px; font-size: 10px; }
+
+    /* TARJETAS DE SERVICIOS */
+    main { flex: 1; overflow-y: auto; padding: 5px 20px 180px; }
+    .card { background: var(--card); border-radius: 20px; border: 1px solid var(--border); margin-bottom: 12px; display: flex; overflow: hidden; cursor: pointer; transition: 0.2s; }
+    .card-accent { width: 6px; }
+    .card-body { padding: 18px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+    .card-top { display: flex; justify-content: space-between; align-items: center; }
+    .card-id { color: var(--red); font-size: 18px; font-weight: 900; }
+    .card-price { font-size: 22px; font-weight: 900; }
+    .card-mid { color: var(--gray); font-size: 12px; font-weight: 600; line-height: 1.4; }
+    .card-km { color: var(--blue); font-weight: 900; margin-left: 5px; }
+
+    /* FOOTER */
+    footer { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); padding: 20px 25px calc(30px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+    .total-amount { font-size: 32px; font-weight: 900; letter-spacing: -1px; }
+    .fab { background: var(--red); width: 65px; height: 65px; border-radius: 20px; border: none; color: #fff; font-size: 28px; box-shadow: 0 10px 25px rgba(225, 29, 72, 0.4); cursor: pointer; }
+
+    /* MODALES GENÉRICOS */
+    .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; display: flex; align-items: flex-end; }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .bottom-sheet { width: 100%; height: 92%; background: #000; border-radius: 30px 30px 0 0; transform: translateY(100%); transition: 0.4s; padding: 25px; border-top: 1px solid var(--border); overflow-y: auto; }
+    .modal-overlay.active .bottom-sheet { transform: translateY(0); }
+    .sheet-header { display: flex; align-items: center; margin-bottom: 25px; }
+    .btn-close { background: var(--input); border: none; color: #fff; width: 45px; height: 45px; border-radius: 14px; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 18px; }
+    .sheet-title { flex: 1; text-align: center; font-weight: 900; font-size: 18px; color: var(--red); margin-right: 45px; }
+    .full-height { height: 95% !important; }
+
+    /* DASHBOARD ESTILOS */
     .analytics-grid { display: flex; gap: 10px; margin-bottom: 20px; }
     .metric-mini { flex: 1; background: var(--input); padding: 15px; border-radius: 15px; border: 1px solid var(--border); }
     .m-label { display: block; color: var(--gray); font-size: 8px; font-weight: 900; margin-bottom: 4px; }
     .m-value { font-size: 14px; font-weight: 900; color: #fff; }
     .chart-box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; }
     .chart-box h3 { font-size: 12px; color: var(--gray); margin-bottom: 15px; font-weight: 900; text-align: center; }
-    .full-height { height: 95% !important; }
 
-    main { flex: 1; overflow-y: auto; padding: 10px 20px 180px; }
-    .card { background: var(--card); border-radius: 20px; border: 1px solid var(--border); margin-bottom: 12px; display: flex; overflow: hidden; }
-    .card-accent { width: 6px; }
-    .card-body { padding: 18px; flex: 1; }
-    .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .card-id { color: var(--red); font-size: 18px; font-weight: 900; }
-    .card-price { font-size: 22px; font-weight: 900; }
-    .card-mid { color: var(--gray); font-size: 12px; font-weight: 600; }
-
-    footer { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); padding: 20px 25px calc(30px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
-    .total-amount { font-size: 32px; font-weight: 900; }
-    .fab { background: var(--red); width: 65px; height: 65px; border-radius: 20px; border: none; color: #fff; font-size: 28px; box-shadow: 0 10px 25px rgba(225, 29, 72, 0.4); }
-
-    .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; display: flex; align-items: flex-end; }
-    .modal-overlay.active { opacity: 1; pointer-events: auto; }
-    .bottom-sheet { width: 100%; height: 92%; background: #000; border-radius: 30px 30px 0 0; transform: translateY(100%); transition: 0.4s; padding: 25px; border-top: 1px solid var(--border); overflow-y: auto; }
-    .modal-overlay.active .bottom-sheet { transform: translateY(0); }
-    .sheet-header { display: flex; align-items: center; margin-bottom: 25px; }
-    .btn-close { background: var(--input); border: none; color: #fff; width: 45px; height: 45px; border-radius: 14px; cursor: pointer; }
-    .sheet-title { flex: 1; text-align: center; font-weight: 900; color: var(--red); margin-right: 45px; }
-    
-    .input-group label { display: block; color: var(--gray); font-size: 10px; font-weight: 900; margin-bottom: 5px; }
-    .input-group input, .input-group select { width: 100%; background: var(--input); border: 1px solid var(--border); color: #fff; padding: 14px; border-radius: 12px; font-size: 16px; margin-bottom: 15px; }
+    /* FORMULARIOS */
+    .row-inputs { display: flex; gap: 10px; }
+    .input-group { flex: 1; }
+    .input-group label { display: block; color: var(--gray); font-size: 10px; font-weight: 900; margin-bottom: 5px; text-transform: uppercase; }
+    .input-group input, .input-group select { width: 100%; background: var(--input); border: 1px solid var(--border); color: #fff; padding: 14px; border-radius: 12px; outline: none; font-size: 16px; margin-bottom: 15px; font-weight: 700; }
     .toggle-row { display: flex; justify-content: space-between; align-items: center; background: var(--input); padding: 14px 20px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border); }
-    .toggle-btn { padding: 8px 15px; border-radius: 8px; border: none; font-weight: 900; }
+    .toggle-row span { font-weight: 700; font-size: 14px; }
+    .toggle-btn { padding: 8px 15px; border-radius: 8px; border: none; font-weight: 900; cursor: pointer; transition: 0.3s; }
     .toggle-btn.no { background: var(--red); color: #fff; }
     .toggle-btn.si { background: var(--green); color: #fff; }
+    .btn-save { width: 100%; background: var(--red); color: #fff; border: none; padding: 20px; border-radius: 15px; font-size: 16px; font-weight: 900; margin-top: 10px; cursor: pointer; }
+    .btn-del-danger { width: 100%; background: transparent; color: var(--red); border: 1px solid var(--red); padding: 15px; border-radius: 15px; margin-top: 15px; font-weight: bold; cursor: pointer; text-align: center; }
 
+    /* CARTEL ELIMINAR */
+    #modal-confirm { align-items: center; justify-content: center; }
+    .confirm-box { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 30px; width: 85%; max-width: 350px; text-align: center; transform: scale(0.9); opacity: 0; transition: 0.3s; }
+    #modal-confirm.active .confirm-box { transform: scale(1); opacity: 1; }
+    .confirm-box h3 { color: var(--red); font-size: 20px; font-weight: 900; margin-bottom: 10px; }
+    .confirm-box p { color: var(--gray); font-size: 13px; margin-bottom: 25px; line-height: 1.5; }
+    .confirm-actions { display: flex; gap: 15px; }
+    .confirm-actions button { flex: 1; padding: 16px; border-radius: 14px; font-weight: 900; font-size: 14px; border: none; cursor: pointer; }
+    .btn-cancel { background: var(--input); color: #fff; border: 1px solid var(--border); }
+    .btn-confirm-del { background: var(--red); color: #fff; }
+
+    /* LOADER */
     #loading-overlay { position: fixed; inset: 0; background: #000; display: none; z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
-    .loader { border: 4px solid #111; border-top: 4px solid var(--red); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
+    .loader { border: 4px solid #111; border-top: 4px solid var(--red); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 </style>
+
 <script>
     const API_KEY = 'AIzaSyCg2T_OVIV0C6Lmx-JCmV67nLiQDAwqbss';
     const CLIENT_ID = '474241917322-l7ub2cma675eat9g7ht2q8po09a15qhl.apps.googleusercontent.com';
@@ -269,10 +320,8 @@
     function handleAuthClick() {
         const token = localStorage.getItem('g_token');
         if (token) {
-            localStorage.removeItem('g_token');
-            gapi.client.setToken(null);
-            records = []; driveFileId = null;
-            updateAuthUI(false); render();
+            localStorage.removeItem('g_token'); gapi.client.setToken(null);
+            records = []; driveFileId = null; updateAuthUI(false); render();
         } else {
             tokenClient.callback = async (r) => { 
                 if(r.error) return; 
@@ -295,8 +344,7 @@
             } else {
                 const meta = { name: DB_NAME, mimeType: 'application/json' };
                 const file = await gapi.client.drive.files.create({ resource: meta, fields: 'id' });
-                driveFileId = file.result.id;
-                records = [];
+                driveFileId = file.result.id; records = [];
             }
             render();
         } catch(e) {}
@@ -307,38 +355,40 @@
         if(!driveFileId || !gapi.client.getToken()) return;
         try {
             await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
-                method: 'PATCH', 
-                headers: { 'Authorization': `Bearer ${gapi.client.getToken().access_token}` }, 
+                method: 'PATCH', headers: { 'Authorization': `Bearer ${gapi.client.getToken().access_token}` }, 
                 body: JSON.stringify(records)
             });
         } catch(e) {}
     }
 
-    // --- LÓGICA DE DASHBOARD ---
-    function openDashboard() {
-        document.getElementById('modal-dashboard').classList.add('active');
-        processAnalytics();
+    /* --- LÓGICA DE INTERFAZ Y MENÚS --- */
+    function toggleMenu() { document.getElementById('main-menu').classList.toggle('active'); }
+    
+    // Cierra el menú si tocás afuera
+    window.onclick = function(event) {
+        if (!event.target.matches('#menu-btn') && !event.target.matches('#menu-btn i')) {
+            document.getElementById('main-menu').classList.remove('active');
+        }
     }
 
-    function closeDashboard() {
-        document.getElementById('modal-dashboard').classList.remove('active');
-    }
+    function openFilters() { document.getElementById('modal-filtros').classList.add('active'); }
+    function closeFilters() { document.getElementById('modal-filtros').classList.remove('active'); }
+
+    /* --- LÓGICA DE DASHBOARD --- */
+    function openDashboard() { document.getElementById('modal-dashboard').classList.add('active'); processAnalytics(); }
+    function closeDashboard() { document.getElementById('modal-dashboard').classList.remove('active'); }
 
     function processAnalytics() {
         if (!records.length) return;
-
-        // 1. Ticket Promedio
         const totalDinero = records.reduce((s, r) => s + parseFloat(r.monto || 0), 0);
         const promedio = totalDinero / records.length;
         document.getElementById('dash-promedio').innerText = '$' + promedio.toLocaleString('es-AR', {maximumFractionDigits:0});
 
-        // 2. Top Vehículo
         const vehiculos = {};
         records.forEach(r => { if(r.vehiculo) vehiculos[r.vehiculo] = (vehiculos[r.vehiculo] || 0) + 1; });
         const topV = Object.keys(vehiculos).sort((a,b) => vehiculos[b] - vehiculos[a])[0] || "N/A";
         document.getElementById('dash-top-v').innerText = topV.toUpperCase();
 
-        // 3. Gráfico de Facturación Mensual (Últimos 6 meses)
         const meses = {};
         records.forEach(r => {
             const m = r.fecha.substring(0, 7);
@@ -350,28 +400,22 @@
         if(myChartBilling) myChartBilling.destroy();
         myChartBilling = new Chart(document.getElementById('chart-billing'), {
             type: 'bar',
-            data: {
-                labels: labelsMeses,
-                datasets: [{ label: 'Facturación $', data: dataMeses, backgroundColor: '#3b82f6', borderRadius: 8 }]
-            },
+            data: { labels: labelsMeses, datasets: [{ label: 'Facturación $', data: dataMeses, backgroundColor: '#3b82f6', borderRadius: 8 }] },
             options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#262626' } } } }
         });
 
-        // 4. Gráfico de Estado de Cobros
         const cobrados = records.filter(r => r.cobrado === 'SI').length;
         const pendientes = records.length - cobrados;
 
         if(myChartStatus) myChartStatus.destroy();
         myChartStatus = new Chart(document.getElementById('chart-status'), {
             type: 'doughnut',
-            data: {
-                labels: ['Cobrado', 'Pendiente'],
-                datasets: [{ data: [cobrados, pendientes], backgroundColor: ['#10b981', '#e11d48'], borderWidth: 0 }]
-            },
+            data: { labels: ['Cobrado', 'Pendiente'], datasets: [{ data: [cobrados, pendientes], backgroundColor: ['#10b981', '#e11d48'], borderWidth: 0 }] },
             options: { cutout: '70%', plugins: { legend: { position: 'bottom', labels: { color: '#71717a', font: { weight: 'bold' } } } } }
         });
     }
 
+    /* --- LÓGICA DE RENDERIZADO Y FILTROS --- */
     function render() {
         const searchVal = document.getElementById('main-search').value.toLowerCase();
         let data = showAll ? records : records.filter(r => r.fecha.startsWith(currentMonth));
@@ -389,25 +433,38 @@
         document.getElementById('stat-pendiente').innerText = '$' + penMonto.toLocaleString('es-AR');
         document.getElementById('stat-cobrado').innerText = '$' + cobMonto.toLocaleString('es-AR');
 
-        document.getElementById('current-month-display').innerText = showAll ? "Historial" : currentMonth;
-        data.sort((a,b) => sortAsc ? a.fecha.localeCompare(b.fecha) : b.fecha.localeCompare(a.fecha));
+        document.getElementById('current-month-display').innerText = showAll ? "HISTORIAL" : currentMonth;
+        document.getElementById('c-Todos').innerText = data.length;
+        document.getElementById('c-Pendiente').innerText = data.filter(x => x.estado === 'Pendiente').length;
+        document.getElementById('c-Terminado').innerText = data.filter(x => x.estado === 'Terminado').length;
+
+        if(currentFilter !== 'Todos') data = data.filter(r => r.estado === currentFilter);
+
+        data.sort((a,b) => {
+            let res = sortBy === 'FECHA' ? a.fecha.localeCompare(b.fecha) : (sortBy === 'MONTO' ? parseFloat(a.monto) - parseFloat(b.monto) : parseInt(a.servicio) - parseInt(b.servicio));
+            return sortAsc ? res : -res;
+        });
 
         const container = document.getElementById('list-container');
         container.innerHTML = data.length ? '' : '<p style="text-align:center; margin-top:50px; opacity:0.1; font-weight:900; font-size:30px;">SIN DATOS</p>';
 
         data.forEach(r => {
-            const color = r.estado === 'Terminado' ? 'var(--green)' : 'var(--red)';
+            const color = r.estado === 'Terminado' ? 'var(--green)' : (r.estado === 'En Curso' ? 'var(--blue)' : 'var(--red)');
             const div = document.createElement('div');
             div.className = 'card';
             div.innerHTML = `<div class="card-accent" style="background:${color}"></div>
                 <div class="card-body" onclick="openForm('${r.id}')">
                     <div class="card-top"><span class="card-id">#${r.servicio}</span><span class="card-price">$${parseFloat(r.monto).toLocaleString('es-AR')}</span></div>
-                    <div class="card-mid"><b>${r.patente || 'S/P'}</b> | ${r.vehiculo || 'S/D'}<br>${r.fecha.split('-').reverse().join('/')}</div>
+                    <div class="card-mid">
+                        <i class="fa-solid fa-car"></i> <b>${r.patente || 'S/P'}</b> | ${r.vehiculo || 'S/D'}<br>
+                        <i class="fa-solid fa-calendar"></i> ${r.fecha.split('-').reverse().join('/')} 
+                        <span class="card-km"> <i class="fa-solid fa-route"></i> ${r.km || 0} km</span>
+                    </div>
                 </div>`;
             container.appendChild(div);
         });
         const total = data.reduce((s, r) => s + parseFloat(r.monto || 0), 0);
-        document.getElementById('total-monto').innerText = '$' + total.toLocaleString('es-AR');
+        document.getElementById('total-monto').innerText = '$' + total.toLocaleString('es-AR', {minimumFractionDigits: 2});
     }
 
     function toggleAllMonths() { showAll = !showAll; render(); }
@@ -416,9 +473,28 @@
         m += d; if(m>12){m=1;y++} else if(m<1){m=12;y--}
         currentMonth = `${y}-${String(m).padStart(2,'0')}`; showAll = false; render();
     }
-    function setSort(s) { sortBy = s; sortAsc = !sortAsc; render(); }
+    function setFilter(f) { 
+        currentFilter = f; 
+        document.querySelectorAll('.chip-filter').forEach(c => c.classList.remove('active')); 
+        document.getElementById(`f-${f}`).classList.add('active'); 
+        render(); closeFilters(); // Cierra el menú al elegir
+    }
+    function setSort(s) {
+        if (sortBy === s) sortAsc = !sortAsc; else { sortBy = s; sortAsc = false; }
+        document.querySelectorAll('.chip-sort').forEach(chip => {
+            chip.classList.remove('active');
+            let t = chip.innerText.replace(' ↑', '').replace(' ↓', '');
+            if (chip.id === `sort-${s}`) { chip.classList.add('active'); chip.innerText = t + (sortAsc ? ' ↑' : ' ↓'); } 
+            else { chip.innerText = t; }
+        });
+        render(); closeFilters(); // Cierra el menú al elegir
+    }
+
+    /* --- LÓGICA DE FORMULARIO CRUD --- */
     function toggleBtn(btn) { btn.innerText = btn.innerText === 'SI' ? 'NO' : 'SI'; btn.className = 'toggle-btn ' + (btn.innerText === 'SI' ? 'si' : 'no'); }
+    
     function openForm(id = null) {
+        document.getElementById('btn-del').style.display = id ? 'block' : 'none';
         if(id) {
             const r = records.find(x => x.id === id);
             document.getElementById('f-id').value = r.id; 
@@ -426,54 +502,93 @@
             document.getElementById('f-servicio').value = r.servicio; 
             document.getElementById('f-monto').value = r.monto; 
             document.getElementById('f-patente').value = r.patente; 
-            document.getElementById('f-vehiculo').value = r.vehiculo;
-            document.getElementById('f-km').value = r.km;
-            document.getElementById('f-motivo').value = r.motivo;
+            document.getElementById('f-vehiculo').value = r.vehiculo || '';
+            document.getElementById('f-km').value = r.km || '';
+            document.getElementById('f-motivo').value = r.motivo; 
             document.getElementById('f-estado').value = r.estado;
+            document.getElementById('f-conciliado').innerText = r.conciliado || 'NO';
+            document.getElementById('f-conciliado').className = 'toggle-btn ' + (r.conciliado === 'SI' ? 'si' : 'no');
             document.getElementById('f-cobrado').innerText = r.cobrado || 'NO';
             document.getElementById('f-cobrado').className = 'toggle-btn ' + (r.cobrado === 'SI' ? 'si' : 'no');
         } else {
             document.getElementById('f-id').value = ''; 
-            document.getElementById('f-fecha').value = new Date().toISOString().substring(0,10);
+            document.getElementById('f-fecha').value = new Date().toISOString().substring(0,10); 
+            document.getElementById('f-servicio').value = ''; document.getElementById('f-monto').value = ''; 
+            document.getElementById('f-patente').value = ''; document.getElementById('f-vehiculo').value = '';
+            document.getElementById('f-km').value = ''; document.getElementById('f-motivo').value = ''; 
+            document.getElementById('f-estado').value = 'Pendiente';
+            document.getElementById('f-conciliado').innerText = 'NO'; document.getElementById('f-conciliado').className = 'toggle-btn no';
+            document.getElementById('f-cobrado').innerText = 'NO'; document.getElementById('f-cobrado').className = 'toggle-btn no';
         }
         document.getElementById('modal-form').classList.add('active');
     }
     function closeForm() { document.getElementById('modal-form').classList.remove('active'); }
+    function openConfirm() { document.getElementById('modal-confirm').classList.add('active'); }
+    function closeConfirm() { document.getElementById('modal-confirm').classList.remove('active'); }
+    
     async function saveRecord() {
         const id = document.getElementById('f-id').value;
         const data = { 
             id: id || Math.random().toString(36).substr(2, 9), 
             fecha: document.getElementById('f-fecha').value, 
-            servicio: document.getElementById('f-servicio').value, 
-            monto: document.getElementById('f-monto').value, 
-            patente: document.getElementById('f-patente').value.toUpperCase(),
+            servicio: document.getElementById('f-servicio').value || '0', 
+            monto: document.getElementById('f-monto').value || 0, 
+            patente: document.getElementById('f-patente').value.toUpperCase(), 
             vehiculo: document.getElementById('f-vehiculo').value,
-            km: document.getElementById('f-km').value,
-            motivo: document.getElementById('f-motivo').value,
+            km: document.getElementById('f-km').value || 0,
+            motivo: document.getElementById('f-motivo').value, 
             estado: document.getElementById('f-estado').value,
+            conciliado: document.getElementById('f-conciliado').innerText,
             cobrado: document.getElementById('f-cobrado').innerText
         };
         if(id) records = records.map(r => r.id === id ? data : r); else records.push(data);
         closeForm(); render(); await saveToDrive();
     }
+    
+    async function confirmDelete() { 
+        closeConfirm();
+        records = records.filter(r => r.id !== document.getElementById('f-id').value); 
+        closeForm(); render(); await saveToDrive(); 
+    }
+
+    /* --- LÓGICA DE IMPORTACIÓN Y EXPORTACIÓN --- */
     function exportToCSV() {
-        let csv = "FECHA,SERVICIO,MONTO,PATENTE,VEHICULO,COBRADO\n";
-        records.forEach(r => csv += `${r.fecha},${r.servicio},${r.monto},${r.patente},${r.vehiculo},${r.cobrado}\n`);
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'RedSOS_Reporte.csv'; a.click();
+        if (!records.length) return alert("No hay datos para exportar.");
+        let csv = "ID,FECHA,SERVICIO,MONTO,PATENTE,VEHICULO,KM,MOTIVO,ESTADO,CONCILIADO,COBRADO\n";
+        records.forEach(r => {
+            let motivoLimpio = `"${(r.motivo || '').replace(/"/g, '""')}"`;
+            let row = [ r.id, r.fecha, r.servicio, r.monto, r.patente, r.vehiculo, r.km, motivoLimpio, r.estado, r.conciliado, r.cobrado ];
+            csv += row.join(",") + "\n";
+        });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `RedSOS_Reporte_${new Date().toISOString().substring(0,10)}.csv`; link.click();
     }
+
     function exportBackup() {
+        if (!records.length) return alert("No hay datos para respaldar.");
         const blob = new Blob([JSON.stringify(records)], { type: 'application/json' });
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'RedSOS_Backup.json'; a.click();
+        const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `RedSOS_Backup.json`; link.click();
     }
+
     function importBackup(event) {
         const file = event.target.files[0];
+        if (!file) return;
         const reader = new FileReader();
-        reader.onload = async (e) => {
-            records = JSON.parse(e.target.result);
-            document.getElementById('loading-overlay').style.display = 'flex';
-            await saveToDrive(); render();
-            document.getElementById('loading-overlay').style.display = 'none';
+        reader.onload = async function(e) {
+            try {
+                const importado = JSON.parse(e.target.result);
+                if (Array.isArray(importado)) {
+                    if (confirm(`Encontramos ${importado.length} registros.\n\n[ACEPTAR] para SUMAR a la base actual.\n[CANCELAR] para REEMPLAZAR todo.`)) {
+                        const idsActuales = new Set(records.map(r => r.id));
+                        importado.forEach(n => { if (!idsActuales.has(n.id)) records.push(n); });
+                    } else {
+                        if (confirm("Vas a borrar los datos actuales. ¿Seguro?")) records = importado; else { event.target.value = ''; return; }
+                    }
+                    document.getElementById('loading-overlay').style.display = 'flex';
+                    await saveToDrive(); render(); alert("Base actualizada.");
+                }
+            } catch (error) { alert("Archivo inválido."); }
+            document.getElementById('loading-overlay').style.display = 'none'; event.target.value = '';
         };
         reader.readAsText(file);
     }

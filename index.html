@@ -11,45 +11,47 @@
 
 <div id="loading-overlay">
     <div class="loader"></div>
-    <p>CONECTANDO SOS CLOUD...</p>
+    <p>SINCRONIZANDO...</p>
 </div>
 
 <div id="app-container">
     <header>
         <div class="logo">SOS</div>
-        <button id="auth-btn" onclick="handleAuthClick()">
-            <i class="fa-brands fa-google"></i> <span id="auth-text">LOGIN</span>
-        </button>
+        <div id="auth-status">
+            <button id="auth-btn" onclick="handleAuthClick()">
+                <i class="fa-brands fa-google"></i> <span id="auth-text">CONECTAR</span>
+            </button>
+        </div>
     </header>
 
     <div class="time-bar">
+        <button id="btn-toggle-all" onclick="toggleAllMonths()">
+            <i class="fa-solid fa-list-ul"></i>
+        </button>
         <div class="month-nav">
             <button onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
             <span id="current-month-display">---</span>
             <button onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
         </div>
-        <button id="btn-toggle-all" onclick="toggleAllMonths()">
-            <i class="fa-solid fa-list-ul"></i>
-        </button>
     </div>
 
     <div class="scroll-bar">
         <div class="chip chip-sort active" id="sort-FECHA" onclick="setSort('FECHA')">FECHA ↓</div>
         <div class="chip chip-sort" id="sort-MONTO" onclick="setSort('MONTO')">MONTO</div>
-        <div class="chip chip-sort" id="sort-SERVICIO" onclick="setSort('SERVICIO')">SERVICIO</div>
+        <div class="chip chip-sort" id="sort-SERVICIO" onclick="setSort('SERVICIO')">N°</div>
     </div>
 
-    <div class="scroll-bar">
+    <div class="scroll-bar filters">
         <div class="chip chip-filter active" id="f-Todos" onclick="setFilter('Todos')">Todos <span class="badge" id="c-Todos">0</span></div>
-        <div class="chip chip-filter" id="f-Pendiente" onclick="setFilter('Pendiente')">Pendientes <span class="badge" id="c-Pendiente">0</span></div>
-        <div class="chip chip-filter" id="f-Terminado" onclick="setFilter('Terminado')">Terminados <span class="badge" id="c-Terminado">0</span></div>
+        <div class="chip chip-filter" id="f-Pendiente" onclick="setFilter('Pendiente')">Pend. <span class="badge" id="c-Pendiente">0</span></div>
+        <div class="chip chip-filter" id="f-Terminado" onclick="setFilter('Terminado')">Term. <span class="badge" id="c-Terminado">0</span></div>
     </div>
 
     <main id="list-container"></main>
 
     <footer>
         <div class="total-box">
-            <span id="total-label">RESUMEN TOTAL</span>
+            <span id="total-label">TOTAL DEL MES</span>
             <div class="total-amount" id="total-monto">$0,00</div>
         </div>
         <button class="fab" onclick="openForm()">
@@ -61,17 +63,17 @@
         <div class="bottom-sheet">
             <div class="sheet-header">
                 <button class="btn-close" onclick="closeForm()"><i class="fa-solid fa-xmark"></i></button>
-                <div class="sheet-title">NUEVO SERVICIO</div>
+                <div class="sheet-title" id="form-title">NUEVO REGISTRO</div>
             </div>
             <div class="sheet-body">
                 <input type="hidden" id="f-id">
                 <div class="input-group"><label>FECHA</label><input type="date" id="f-fecha"></div>
-                <div style="display:flex; gap:15px;">
-                    <div class="input-group" style="flex:1.2;"><label>SERVICIO #</label><input type="number" id="f-servicio" placeholder="Ej: 850"></div>
-                    <div class="input-group" style="flex:2;"><label>MONTO ($)</label><input type="number" step="0.01" id="f-monto" placeholder="0.00"></div>
+                <div class="row-inputs">
+                    <div class="input-group"><label>SERVICIO #</label><input type="number" id="f-servicio"></div>
+                    <div class="input-group"><label>MONTO ($)</label><input type="number" step="0.01" id="f-monto"></div>
                 </div>
-                <div class="input-group"><label>PATENTE / VEHÍCULO</label><input type="text" id="f-patente" placeholder="Ej: AE-123-CC"></div>
-                <div class="input-group"><label>MOTIVO / DETALLE</label><input type="text" id="f-motivo" placeholder="Mantenimiento..."></div>
+                <div class="input-group"><label>PATENTE / VEHÍCULO</label><input type="text" id="f-patente"></div>
+                <div class="input-group"><label>DETALLE / MOTIVO</label><input type="text" id="f-motivo"></div>
                 <div class="input-group">
                     <label>ESTADO</label>
                     <select id="f-estado">
@@ -80,80 +82,89 @@
                         <option value="Terminado">TERMINADO</option>
                     </select>
                 </div>
-                <button class="btn-save" onclick="saveRecord()">GUARDAR EN DRIVE</button>
-                <button id="btn-del" class="btn-del" onclick="deleteRecord()" style="display:none;">ELIMINAR REGISTRO</button>
+                <button class="btn-save" onclick="saveRecord()">✓ GUARDAR CAMBIOS</button>
+                <button id="btn-del" class="btn-del-danger" onclick="deleteRecord()">
+                    <i class="fa-regular fa-trash-can"></i> ELIMINAR REGISTRO
+                </button>
             </div>
         </div>
     </div>
 </div>
 <style>
     :root {
-        --bg: #000; --card: #111; --input: #1a1a1a; --border: #222;
-        --red: #e11d48; --blue: #3b82f6; --green: #10b981; --text: #fff; --gray: #71717a;
+        --bg: #000; --card: #111; --input: #181818; --border: #262626;
+        --red: #e11d48; --green: #10b981; --text: #fff; --gray: #71717a;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; justify-content: center; }
-    #app-container { width: 100%; max-width: 500px; height: 100%; display: flex; flex-direction: column; position: relative; }
+    body { background: #000; color: #fff; height: 100vh; overflow: hidden; }
+    #app-container { width: 100%; max-width: 500px; height: 100%; margin: 0 auto; display: flex; flex-direction: column; position: relative; }
 
-    header { padding: 35px 20px 15px; display: flex; justify-content: space-between; align-items: center; }
-    .logo { color: var(--red); font-size: 42px; font-weight: 900; letter-spacing: 2px; font-style: italic; text-shadow: 0 0 15px rgba(225, 29, 72, 0.3); }
-    #auth-btn { background: var(--card); border: 1px solid var(--border); color: #fff; padding: 10px 18px; border-radius: 14px; font-size: 11px; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+    /* Header arreglado */
+    header { padding: 25px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
+    .logo { color: var(--red); font-size: 36px; font-weight: 900; letter-spacing: 1px; font-style: italic; }
+    #auth-btn { background: var(--input); border: 1px solid var(--border); color: #fff; padding: 8px 12px; border-radius: 12px; font-size: 10px; font-weight: 900; display: flex; align-items: center; gap: 6px; }
     #auth-btn.logged-in { border-color: var(--green); color: var(--green); }
 
-    .time-bar { padding: 0 20px 10px; display: flex; gap: 10px; }
-    .month-nav { flex: 1; background: var(--input); border: 1px solid var(--border); border-radius: 16px; display: flex; justify-content: space-between; align-items: center; padding: 5px; }
-    .month-nav button { background: transparent; border: none; color: var(--gray); padding: 10px; cursor: pointer; }
-    #current-month-display { font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
-    #btn-toggle-all { background: var(--input); border: 1px solid var(--border); color: var(--gray); width: 48px; border-radius: 16px; cursor: pointer; }
+    /* Barra de tiempo compacta */
+    .time-bar { padding: 5px 20px 10px; display: flex; gap: 10px; }
+    .month-nav { flex: 1; background: var(--input); border: 1px solid var(--border); border-radius: 15px; display: flex; justify-content: space-between; align-items: center; padding: 4px; }
+    .month-nav button { background: transparent; border: none; color: var(--gray); padding: 8px 12px; }
+    #current-month-display { font-size: 13px; font-weight: 900; text-transform: uppercase; }
+    #btn-toggle-all { background: var(--input); border: 1px solid var(--border); color: var(--gray); width: 45px; border-radius: 15px; }
     #btn-toggle-all.active { color: var(--red); border-color: var(--red); }
 
-    .scroll-bar { display: flex; overflow-x: auto; padding: 8px 20px; gap: 10px; scrollbar-width: none; }
+    /* Chips */
+    .scroll-bar { display: flex; overflow-x: auto; padding: 5px 20px 10px; gap: 8px; scrollbar-width: none; }
     .scroll-bar::-webkit-scrollbar { display: none; }
-    .chip { padding: 10px 18px; border-radius: 14px; font-size: 12px; font-weight: bold; background: var(--card); border: 1px solid var(--border); color: var(--gray); white-space: nowrap; display: flex; align-items: center; gap: 8px; }
+    .chip { padding: 10px 15px; border-radius: 12px; font-size: 11px; font-weight: bold; background: var(--card); border: 1px solid var(--border); color: var(--gray); white-space: nowrap; display: flex; align-items: center; gap: 5px; }
     .chip.active { background: var(--red); color: #fff; border-color: var(--red); }
     .chip-sort.active { background: #fff; color: #000; border-color: #fff; }
-    .badge { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 6px; font-size: 10px; }
+    .badge { background: rgba(255,255,255,0.1); padding: 2px 5px; border-radius: 5px; font-size: 9px; }
 
+    /* Lista */
     main { flex: 1; overflow-y: auto; padding: 10px 20px 150px; }
-    .card { background: var(--card); border-radius: 22px; border: 1px solid var(--border); margin-bottom: 15px; display: flex; overflow: hidden; animation: slideIn 0.3s ease; }
-    @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .card-accent { width: 6px; }
-    .card-body { padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+    .card { background: var(--card); border-radius: 20px; border: 1px solid var(--border); margin-bottom: 12px; display: flex; overflow: hidden; }
+    .card-accent { width: 5px; }
+    .card-body { padding: 15px 18px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
     .card-top { display: flex; justify-content: space-between; align-items: center; }
-    .card-id { color: var(--red); font-size: 19px; font-weight: 900; }
-    .card-price { font-size: 24px; font-weight: 900; letter-spacing: -1px; }
-    .card-mid { display: flex; gap: 12px; color: var(--gray); font-size: 12px; font-weight: 600; }
-    .card-desc { font-size: 13px; color: #666; font-style: italic; }
+    .card-id { color: var(--red); font-size: 18px; font-weight: 900; }
+    .card-price { font-size: 22px; font-weight: 900; letter-spacing: -1px; }
+    .card-mid { display: flex; gap: 10px; color: var(--gray); font-size: 12px; font-weight: 600; }
 
-    footer { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(20px); padding: 20px 25px 50px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
-    #total-label { color: var(--gray); font-size: 11px; font-weight: 900; letter-spacing: 1px; }
-    .total-amount { font-size: 36px; font-weight: 900; letter-spacing: -1.5px; }
-    .fab { background: var(--red); width: 70px; height: 62px; border-radius: 22px; border: none; color: #fff; font-size: 30px; box-shadow: 0 10px 30px rgba(225, 29, 72, 0.4); display: flex; align-items: center; justify-content: center; }
+    /* Footer */
+    footer { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); padding: 15px 25px 40px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    #total-label { color: var(--gray); font-size: 10px; font-weight: 900; letter-spacing: 1px; }
+    .total-amount { font-size: 32px; font-weight: 900; letter-spacing: -1px; }
+    .fab { background: var(--red); width: 65px; height: 58px; border-radius: 18px; border: none; color: #fff; font-size: 28px; box-shadow: 0 10px 25px rgba(225, 29, 72, 0.4); }
 
-    .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; display: flex; align-items: flex-end; }
+    /* Modal Formulario */
+    .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; display: flex; align-items: flex-end; }
     .modal-overlay.active { opacity: 1; pointer-events: auto; }
-    .bottom-sheet { width: 100%; height: 94%; background: #000; border-radius: 35px 35px 0 0; transform: translateY(100%); transition: 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); padding: 30px; border-top: 1px solid var(--border); overflow-y: auto; }
+    .bottom-sheet { width: 100%; height: 92%; background: #000; border-radius: 30px 30px 0 0; transform: translateY(100%); transition: 0.4s cubic-bezier(0, 1, 0.5, 1); padding: 25px; border-top: 1px solid var(--border); overflow-y: auto; }
     .modal-overlay.active .bottom-sheet { transform: translateY(0); }
-    .btn-close { background: var(--input); border: none; color: #fff; padding: 14px; border-radius: 16px; }
-    .sheet-title { flex: 1; text-align: center; font-weight: 900; font-size: 18px; margin-right: 40px; }
-    .input-group { margin-bottom: 22px; }
-    .input-group label { display: block; color: var(--gray); font-size: 11px; font-weight: 900; margin-bottom: 8px; letter-spacing: 1px; }
-    .input-group input, .input-group select { width: 100%; background: var(--input); border: 1px solid var(--border); color: #fff; padding: 18px; border-radius: 16px; outline: none; font-size: 16px; font-weight: 700; }
-    .btn-save { width: 100%; background: var(--red); color: #fff; border: none; padding: 22px; border-radius: 20px; font-size: 16px; font-weight: 900; margin-top: 10px; }
-    .btn-del { width: 100%; background: transparent; color: #444; border: none; padding: 15px; font-weight: bold; }
+    .sheet-header { display: flex; align-items: center; margin-bottom: 25px; }
+    .btn-close { background: var(--input); border: none; color: #fff; padding: 12px; border-radius: 12px; }
+    .sheet-title { flex: 1; text-align: center; font-weight: 900; font-size: 16px; margin-right: 40px; color: var(--red); }
+    
+    .row-inputs { display: flex; gap: 15px; }
+    .input-group { margin-bottom: 18px; flex: 1; }
+    .input-group label { display: block; color: var(--gray); font-size: 10px; font-weight: 900; margin-bottom: 6px; letter-spacing: 1px; }
+    .input-group input, .input-group select { width: 100%; background: var(--input); border: 1px solid var(--border); color: #fff; padding: 15px; border-radius: 12px; outline: none; font-size: 16px; font-weight: 700; }
+    
+    .btn-save { width: 100%; background: var(--red); color: #fff; border: none; padding: 18px; border-radius: 15px; font-size: 15px; font-weight: 900; margin-top: 10px; }
+    .btn-del-danger { width: 100%; background: rgba(225, 29, 72, 0.1); color: var(--red); border: 1px solid var(--red); padding: 15px; border-radius: 15px; font-weight: bold; margin-top: 15px; font-size: 13px; }
 
-    #loading-overlay { position: fixed; inset: 0; background: #000; display: none; z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
-    .loader { border: 4px solid #111; border-top: 4px solid var(--red); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
+    #loading-overlay { position: fixed; inset: 0; background: #000; display: none; z-index: 9999; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: 12px; letter-spacing: 2px; }
+    .loader { border: 3px solid #111; border-top: 3px solid var(--red); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 10px; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
-                                                                                                                                                         </style>
-                                                                                                                                                         
-   <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+           </style>
+           <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
 <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 
 <script>
     const API_KEY = 'AIzaSyCg2T_OVIV0C6Lmx-JCmV67nLiQDAwqbss';
     const CLIENT_ID = '474241917322-l7ub2cma675eat9g7ht2q8po09a15qhl.apps.googleusercontent.com';
-    const DB_NAME = 'sos_maintenance_v3.json';
+    const FILE_NAME = 'sos_drive_database_v5.json';
 
     let tokenClient, gapiInited = false, gisInited = false, driveFileId = null;
     let records = [], currentFilter = 'Todos', sortBy = 'FECHA', sortAsc = false, showAll = false;
@@ -164,30 +175,30 @@
 
     async function checkAuth() {
         const token = localStorage.getItem('g_token');
-        if(token) { gapi.client.setToken({access_token: token}); updateAuthUI(true); syncData(); } else { render(); }
+        if(token) { gapi.client.setToken({access_token: token}); updateAuthUI(true); sync(); } else { render(); }
     }
 
     function handleAuthClick() {
-        tokenClient.callback = async (r) => { if(r.error) return; localStorage.setItem('g_token', r.access_token); updateAuthUI(true); syncData(); };
+        tokenClient.callback = async (r) => { if(r.error) return; localStorage.setItem('g_token', r.access_token); updateAuthUI(true); sync(); };
         tokenClient.requestAccessToken({prompt: gapi.client.getToken() ? '' : 'consent'});
     }
 
     function updateAuthUI(logged) { 
         const btn = document.getElementById('auth-btn');
-        if(logged) { btn.classList.add('logged-in'); document.getElementById('auth-text').innerText = 'CONECTADO'; } 
+        if(logged) { btn.classList.add('logged-in'); document.getElementById('auth-text').innerText = 'EN LA NUBE'; } 
     }
 
-    async function syncData() {
+    async function sync() {
         document.getElementById('loading-overlay').style.display = 'flex';
         try {
-            const res = await gapi.client.drive.files.list({ q: `name = '${DB_NAME}' and trashed = false` });
+            const res = await gapi.client.drive.files.list({ q: `name = '${FILE_NAME}' and trashed = false` });
             const files = res.result.files;
             if(files.length > 0) {
                 driveFileId = files[0].id;
                 const content = await gapi.client.drive.files.get({ fileId: driveFileId, alt: 'media' });
                 records = content.result || [];
             } else {
-                const meta = { name: DB_NAME, mimeType: 'application/json' };
+                const meta = { name: FILE_NAME, mimeType: 'application/json' };
                 const file = await gapi.client.drive.files.create({ resource: meta, fields: 'id' });
                 driveFileId = file.result.id;
             }
@@ -196,7 +207,7 @@
         document.getElementById('loading-overlay').style.display = 'none';
     }
 
-    async function pushToDrive() {
+    async function saveToDrive() {
         if(!driveFileId || !gapi.client.getToken()) return;
         await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
             method: 'PATCH', headers: { 'Authorization': `Bearer ${gapi.client.getToken().access_token}` }, body: JSON.stringify(records)
@@ -208,7 +219,7 @@
         const btnAll = document.getElementById('btn-toggle-all');
         const totalLabel = document.getElementById('total-label');
         
-        if(showAll) { display.innerText = "Historial"; btnAll.classList.add('active'); totalLabel.innerText = "TOTAL ACUMULADO"; }
+        if(showAll) { display.innerText = "Historial"; btnAll.classList.add('active'); totalLabel.innerText = "RESUMEN TOTAL"; }
         else { display.innerText = currentMonth; btnAll.classList.remove('active'); totalLabel.innerText = "TOTAL DEL MES"; }
 
         let data = showAll ? records : records.filter(r => r.fecha.startsWith(currentMonth));
@@ -224,13 +235,13 @@
         });
 
         const container = document.getElementById('list-container');
-        container.innerHTML = data.length ? '' : '<div style="text-align:center; margin-top:50px; opacity:0.1;"><i class="fa-solid fa-folder-open fa-4x"></i></div>';
+        container.innerHTML = data.length ? '' : '<p style="text-align:center; margin-top:50px; opacity:0.2; font-weight:900;">VACÍO</p>';
         
         data.forEach(r => {
             const color = r.estado === 'Terminado' ? 'var(--green)' : (r.estado === 'En Curso' ? 'var(--blue)' : 'var(--red)');
             const div = document.createElement('div');
             div.className = 'card';
-            div.innerHTML = `<div class="card-accent" style="background:${color}"></div><div class="card-body" onclick="openForm('${r.id}')"><div class="card-top"><span class="card-id">#${r.servicio}</span><span class="card-price">$${parseFloat(r.monto).toLocaleString('es-AR')}</span></div><div class="card-mid"><i class="fa-solid fa-calendar-day"></i> ${r.fecha.split('-').reverse().join('/')} <i class="fa-solid fa-car-side"></i> ${r.patente || 'S/P'}</div>${r.motivo ? `<div class="card-desc">${r.motivo}</div>` : ''}</div>`;
+            div.innerHTML = `<div class="card-accent" style="background:${color}"></div><div class="card-body" onclick="openForm('${r.id}')"><div class="card-top"><span class="card-id">#${r.servicio}</span><span class="card-price">$${parseFloat(r.monto).toLocaleString('es-AR')}</span></div><div class="card-mid"><i class="fa-solid fa-calendar-day"></i> ${r.fecha.split('-').reverse().join('/')} <i class="fa-solid fa-car"></i> ${r.patente || 'S/P'}</div></div>`;
             container.appendChild(div);
         });
 
@@ -249,6 +260,7 @@
 
     function openForm(id = null) {
         document.getElementById('btn-del').style.display = id ? 'block' : 'none';
+        document.getElementById('form-title').innerText = id ? 'EDITAR REGISTRO' : 'NUEVO REGISTRO';
         if(id) {
             const r = records.find(x => x.id === id);
             document.getElementById('f-id').value = r.id; document.getElementById('f-fecha').value = r.fecha; document.getElementById('f-servicio').value = r.servicio; document.getElementById('f-monto').value = r.monto; document.getElementById('f-patente').value = r.patente; document.getElementById('f-motivo').value = r.motivo; document.getElementById('f-estado').value = r.estado;
@@ -264,10 +276,14 @@
         const id = document.getElementById('f-id').value;
         const data = { id: id || Math.random().toString(36).substr(2, 9), fecha: document.getElementById('f-fecha').value, servicio: document.getElementById('f-servicio').value || '0', monto: document.getElementById('f-monto').value || 0, patente: document.getElementById('f-patente').value.toUpperCase(), motivo: document.getElementById('f-motivo').value, estado: document.getElementById('f-estado').value };
         if(id) records = records.map(r => r.id === id ? data : r); else records.push(data);
-        closeForm(); render(); pushToDrive();
+        closeForm(); render(); saveToDrive();
     }
 
-    async function deleteRecord() { if(!confirm('¿Eliminar?')) return; records = records.filter(r => r.id !== document.getElementById('f-id').value); closeForm(); render(); pushToDrive(); }
+    async function deleteRecord() {
+        if(!confirm('¿Eliminar registro?')) return;
+        records = records.filter(r => r.id !== document.getElementById('f-id').value);
+        closeForm(); render(); saveToDrive();
+    }
 </script>
 </body>
 </html>

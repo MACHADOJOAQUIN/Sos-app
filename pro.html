@@ -71,7 +71,7 @@
 
     <footer>
         <div class="total-box">
-            <span id="total-label">FACTURACIÓN MES</span>
+            <span id="total-label">FACTURACIÓN PERÍODO</span>
             <div class="total-amount" id="total-monto">$0,00</div>
         </div>
         <button class="fab" onclick="openForm()">
@@ -80,12 +80,22 @@
     </footer>
 
     <div class="modal-overlay" id="modal-filtros">
-        <div class="bottom-sheet" style="height: auto; min-height: 40%;">
+        <div class="bottom-sheet" style="height: auto; min-height: 40%; max-height: 90%;">
             <div class="sheet-header">
                 <button class="btn-close" onclick="closeFilters()"><i class="fa-solid fa-xmark"></i></button>
                 <div class="sheet-title">ORDENAR Y FILTRAR</div>
             </div>
             <div class="sheet-body">
+                <label class="filter-label">RANGO DE FECHAS:</label>
+                <div class="row-inputs" style="margin-bottom: 5px;">
+                    <div class="input-group"><label>DESDE</label><input type="date" id="filter-desde"></div>
+                    <div class="input-group"><label>HASTA</label><input type="date" id="filter-hasta"></div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-bottom: 25px;">
+                    <button class="btn-cancel" style="flex: 1; padding: 12px; border-radius: 12px; font-size: 12px;" onclick="clearDateRange()">LIMPIAR</button>
+                    <button class="btn-save" style="flex: 1; margin-top: 0; padding: 12px; border-radius: 12px; font-size: 12px;" onclick="applyDateRange()">APLICAR</button>
+                </div>
+
                 <label class="filter-label">ORDENAR POR:</label>
                 <div class="scroll-bar" style="margin-bottom: 25px;">
                     <div class="chip chip-sort active" id="sort-FECHA" onclick="setSort('FECHA')">FECHA ↓</div>
@@ -173,7 +183,6 @@
     body { background: #000; color: #fff; height: 100dvh; overflow: hidden; display: flex; justify-content: center; }
     #app-container { width: 100%; max-width: 500px; height: 100%; display: flex; flex-direction: column; position: relative; }
 
-    /* HEADER Y MENÚ DESPLEGABLE */
     header { padding: 30px 20px 10px; display: flex; justify-content: space-between; align-items: center; position: relative; }
     .logo { color: #fff; font-size: 28px; font-weight: 900; letter-spacing: -1px; }
     .logo span { color: var(--red); }
@@ -188,7 +197,6 @@
     .dropdown-menu button:hover { background: var(--input); }
     .dropdown-menu i { color: var(--gray); font-size: 16px; }
 
-    /* CONTROLES PRINCIPALES */
     .search-container { padding: 10px 20px; }
     .search-box { background: var(--input); border: 1px solid var(--border); border-radius: 15px; padding: 12px 15px; display: flex; align-items: center; gap: 10px; }
     .search-box input { background: transparent; border: none; color: #fff; outline: none; width: 100%; font-size: 14px; }
@@ -201,14 +209,12 @@
     .stat-value.red { color: var(--red); }
     .stat-value.green { color: var(--green); }
 
-    /* NUEVA BARRA DE FECHA Y FILTROS */
     .controls-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 20px 10px; gap: 10px; }
     .month-nav { flex: 1; background: var(--input); border: 1px solid var(--border); border-radius: 14px; display: flex; justify-content: space-between; align-items: center; padding: 5px; }
     .month-nav button { background: transparent; border: none; color: var(--gray); padding: 10px; font-size: 16px; cursor: pointer; }
     #current-month-display { font-size: 13px; font-weight: 900; color: #fff; cursor: pointer; text-align: center; flex: 1; }
     .btn-filter { background: #fff; border: none; color: #000; padding: 0 18px; height: 42px; border-radius: 14px; font-weight: 900; font-size: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
 
-    /* CHIPS ADENTRO DEL MODAL */
     .filter-label { display: block; color: var(--gray); font-size: 10px; font-weight: 900; margin-bottom: 8px; letter-spacing: 1px; }
     .scroll-bar { display: flex; overflow-x: auto; gap: 8px; scrollbar-width: none; }
     .scroll-bar::-webkit-scrollbar { display: none; }
@@ -217,7 +223,6 @@
     .chip-sort.active { background: #fff; color: #000; border-color: #fff; }
     .badge { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 6px; font-size: 10px; }
 
-    /* TARJETAS DE SERVICIOS */
     main { flex: 1; overflow-y: auto; padding: 5px 20px 180px; }
     .card { background: var(--card); border-radius: 20px; border: 1px solid var(--border); margin-bottom: 12px; display: flex; overflow: hidden; cursor: pointer; transition: 0.2s; }
     .card-accent { width: 6px; }
@@ -228,12 +233,10 @@
     .card-mid { color: var(--gray); font-size: 12px; font-weight: 600; line-height: 1.4; }
     .card-km { color: var(--blue); font-weight: 900; margin-left: 5px; }
 
-    /* FOOTER */
     footer { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); padding: 20px 25px calc(30px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
     .total-amount { font-size: 32px; font-weight: 900; letter-spacing: -1px; }
     .fab { background: var(--red); width: 65px; height: 65px; border-radius: 20px; border: none; color: #fff; font-size: 28px; box-shadow: 0 10px 25px rgba(225, 29, 72, 0.4); cursor: pointer; }
 
-    /* MODALES GENÉRICOS */
     .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; display: flex; align-items: flex-end; }
     .modal-overlay.active { opacity: 1; pointer-events: auto; }
     .bottom-sheet { width: 100%; height: 92%; background: #000; border-radius: 30px 30px 0 0; transform: translateY(100%); transition: 0.4s; padding: 25px; border-top: 1px solid var(--border); overflow-y: auto; }
@@ -243,7 +246,6 @@
     .sheet-title { flex: 1; text-align: center; font-weight: 900; font-size: 18px; color: var(--red); margin-right: 45px; }
     .full-height { height: 95% !important; }
 
-    /* DASHBOARD ESTILOS */
     .analytics-grid { display: flex; gap: 10px; margin-bottom: 20px; }
     .metric-mini { flex: 1; background: var(--input); padding: 15px; border-radius: 15px; border: 1px solid var(--border); }
     .m-label { display: block; color: var(--gray); font-size: 8px; font-weight: 900; margin-bottom: 4px; }
@@ -251,7 +253,6 @@
     .chart-box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; }
     .chart-box h3 { font-size: 12px; color: var(--gray); margin-bottom: 15px; font-weight: 900; text-align: center; }
 
-    /* FORMULARIOS */
     .row-inputs { display: flex; gap: 10px; }
     .input-group { flex: 1; }
     .input-group label { display: block; color: var(--gray); font-size: 10px; font-weight: 900; margin-bottom: 5px; text-transform: uppercase; }
@@ -262,9 +263,9 @@
     .toggle-btn.no { background: var(--red); color: #fff; }
     .toggle-btn.si { background: var(--green); color: #fff; }
     .btn-save { width: 100%; background: var(--red); color: #fff; border: none; padding: 20px; border-radius: 15px; font-size: 16px; font-weight: 900; margin-top: 10px; cursor: pointer; }
+    .btn-cancel { background: transparent; color: var(--gray); border: 1px solid var(--border); cursor: pointer; }
     .btn-del-danger { width: 100%; background: transparent; color: var(--red); border: 1px solid var(--red); padding: 15px; border-radius: 15px; margin-top: 15px; font-weight: bold; cursor: pointer; text-align: center; }
 
-    /* CARTEL ELIMINAR */
     #modal-confirm { align-items: center; justify-content: center; }
     .confirm-box { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 30px; width: 85%; max-width: 350px; text-align: center; transform: scale(0.9); opacity: 0; transition: 0.3s; }
     #modal-confirm.active .confirm-box { transform: scale(1); opacity: 1; }
@@ -272,10 +273,8 @@
     .confirm-box p { color: var(--gray); font-size: 13px; margin-bottom: 25px; line-height: 1.5; }
     .confirm-actions { display: flex; gap: 15px; }
     .confirm-actions button { flex: 1; padding: 16px; border-radius: 14px; font-weight: 900; font-size: 14px; border: none; cursor: pointer; }
-    .btn-cancel { background: var(--input); color: #fff; border: 1px solid var(--border); }
     .btn-confirm-del { background: var(--red); color: #fff; }
 
-    /* LOADER */
     #loading-overlay { position: fixed; inset: 0; background: #000; display: none; z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
     .loader { border: 4px solid #111; border-top: 4px solid var(--red); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
@@ -289,6 +288,9 @@
     let tokenClient, gapiInited = false, gisInited = false, driveFileId = null;
     let records = [], currentFilter = 'Todos', sortBy = 'FECHA', sortAsc = false, showAll = false;
     let currentMonth = new Date().toISOString().substring(0, 7);
+    
+    // NUEVAS VARIABLES PARA EL RANGO DE FECHAS
+    let dateFrom = '', dateTo = '';
     let myChartBilling = null, myChartStatus = null;
 
     window.onload = function() {
@@ -364,7 +366,6 @@
     /* --- LÓGICA DE INTERFAZ Y MENÚS --- */
     function toggleMenu() { document.getElementById('main-menu').classList.toggle('active'); }
     
-    // Cierra el menú si tocás afuera
     window.onclick = function(event) {
         if (!event.target.matches('#menu-btn') && !event.target.matches('#menu-btn i')) {
             document.getElementById('main-menu').classList.remove('active');
@@ -374,18 +375,44 @@
     function openFilters() { document.getElementById('modal-filtros').classList.add('active'); }
     function closeFilters() { document.getElementById('modal-filtros').classList.remove('active'); }
 
+    /* --- LÓGICA DE RANGO DE FECHAS --- */
+    function applyDateRange() {
+        dateFrom = document.getElementById('filter-desde').value;
+        dateTo = document.getElementById('filter-hasta').value;
+        if(!dateFrom || !dateTo) return alert("Por favor, seleccioná ambas fechas.");
+        showAll = false; 
+        render(); 
+        closeFilters();
+    }
+
+    function clearDateRange() {
+        dateFrom = ''; dateTo = '';
+        document.getElementById('filter-desde').value = '';
+        document.getElementById('filter-hasta').value = '';
+        render();
+    }
+
     /* --- LÓGICA DE DASHBOARD --- */
     function openDashboard() { document.getElementById('modal-dashboard').classList.add('active'); processAnalytics(); }
     function closeDashboard() { document.getElementById('modal-dashboard').classList.remove('active'); }
 
     function processAnalytics() {
-        if (!records.length) return;
-        const totalDinero = records.reduce((s, r) => s + parseFloat(r.monto || 0), 0);
-        const promedio = totalDinero / records.length;
+        // Filtrar datos para el dashboard usando el rango de fechas actual
+        let dataDash = records;
+        if (dateFrom && dateTo) {
+            dataDash = dataDash.filter(r => r.fecha >= dateFrom && r.fecha <= dateTo);
+        } else if (!showAll) {
+            dataDash = dataDash.filter(r => r.fecha.startsWith(currentMonth));
+        }
+
+        if (!dataDash.length) return;
+        
+        const totalDinero = dataDash.reduce((s, r) => s + parseFloat(r.monto || 0), 0);
+        const promedio = totalDinero / dataDash.length;
         document.getElementById('dash-promedio').innerText = '$' + promedio.toLocaleString('es-AR', {maximumFractionDigits:0});
 
         const vehiculos = {};
-        records.forEach(r => { if(r.vehiculo) vehiculos[r.vehiculo] = (vehiculos[r.vehiculo] || 0) + 1; });
+        dataDash.forEach(r => { if(r.vehiculo) vehiculos[r.vehiculo] = (vehiculos[r.vehiculo] || 0) + 1; });
         const topV = Object.keys(vehiculos).sort((a,b) => vehiculos[b] - vehiculos[a])[0] || "N/A";
         document.getElementById('dash-top-v').innerText = topV.toUpperCase();
 
@@ -404,8 +431,8 @@
             options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#262626' } } } }
         });
 
-        const cobrados = records.filter(r => r.cobrado === 'SI').length;
-        const pendientes = records.length - cobrados;
+        const cobrados = dataDash.filter(r => r.cobrado === 'SI').length;
+        const pendientes = dataDash.length - cobrados;
 
         if(myChartStatus) myChartStatus.destroy();
         myChartStatus = new Chart(document.getElementById('chart-status'), {
@@ -418,7 +445,18 @@
     /* --- LÓGICA DE RENDERIZADO Y FILTROS --- */
     function render() {
         const searchVal = document.getElementById('main-search').value.toLowerCase();
-        let data = showAll ? records : records.filter(r => r.fecha.startsWith(currentMonth));
+        let data = records;
+
+        // APLICAR RANGO DE FECHAS O MES ACTUAL
+        if (dateFrom && dateTo) {
+            data = data.filter(r => r.fecha >= dateFrom && r.fecha <= dateTo);
+            document.getElementById('current-month-display').innerText = `${dateFrom.split('-').reverse().join('/').substring(0,5)} al ${dateTo.split('-').reverse().join('/').substring(0,5)}`;
+        } else if (!showAll) {
+            data = data.filter(r => r.fecha.startsWith(currentMonth));
+            document.getElementById('current-month-display').innerText = currentMonth;
+        } else {
+            document.getElementById('current-month-display').innerText = "HISTORIAL COMPLETO";
+        }
 
         if(searchVal) {
             data = data.filter(r => 
@@ -433,7 +471,6 @@
         document.getElementById('stat-pendiente').innerText = '$' + penMonto.toLocaleString('es-AR');
         document.getElementById('stat-cobrado').innerText = '$' + cobMonto.toLocaleString('es-AR');
 
-        document.getElementById('current-month-display').innerText = showAll ? "HISTORIAL" : currentMonth;
         document.getElementById('c-Todos').innerText = data.length;
         document.getElementById('c-Pendiente').innerText = data.filter(x => x.estado === 'Pendiente').length;
         document.getElementById('c-Terminado').innerText = data.filter(x => x.estado === 'Terminado').length;
@@ -467,8 +504,9 @@
         document.getElementById('total-monto').innerText = '$' + total.toLocaleString('es-AR', {minimumFractionDigits: 2});
     }
 
-    function toggleAllMonths() { showAll = !showAll; render(); }
+    function toggleAllMonths() { showAll = !showAll; clearDateRange(); } // Al tocar historial, se limpia rango
     function changeMonth(d) {
+        clearDateRange(); // Al cambiar mes manual, se limpia el rango
         let [y, m] = currentMonth.split('-').map(Number);
         m += d; if(m>12){m=1;y++} else if(m<1){m=12;y--}
         currentMonth = `${y}-${String(m).padStart(2,'0')}`; showAll = false; render();
@@ -477,7 +515,7 @@
         currentFilter = f; 
         document.querySelectorAll('.chip-filter').forEach(c => c.classList.remove('active')); 
         document.getElementById(`f-${f}`).classList.add('active'); 
-        render(); closeFilters(); // Cierra el menú al elegir
+        render(); closeFilters();
     }
     function setSort(s) {
         if (sortBy === s) sortAsc = !sortAsc; else { sortBy = s; sortAsc = false; }
@@ -487,7 +525,7 @@
             if (chip.id === `sort-${s}`) { chip.classList.add('active'); chip.innerText = t + (sortAsc ? ' ↑' : ' ↓'); } 
             else { chip.innerText = t; }
         });
-        render(); closeFilters(); // Cierra el menú al elegir
+        render(); closeFilters();
     }
 
     /* --- LÓGICA DE FORMULARIO CRUD --- */

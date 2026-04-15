@@ -21,12 +21,15 @@
     <header>
         <div class="logo">RED<span>SOS</span></div>
         <div class="header-actions">
-            <button id="auth-btn" onclick="handleAuthClick()">
-                <i class="fa-brands fa-google"></i> <span id="auth-text">...</span>
-            </button>
-            <button id="menu-btn" onclick="toggleMenu()">
-                <i class="fa-solid fa-ellipsis-vertical"></i>
-            </button>
+            <div id="user-name-display"></div>
+            <div class="header-actions-row">
+                <button id="auth-btn" onclick="handleAuthClick()">
+                    <i class="fa-brands fa-google"></i> <span id="auth-text">...</span>
+                </button>
+                <button id="menu-btn" onclick="toggleMenu()">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+            </div>
         </div>
 
         <div class="dropdown-menu" id="main-menu">
@@ -186,12 +189,17 @@
     header { padding: 30px 20px 10px; display: flex; justify-content: space-between; align-items: center; position: relative; }
     .logo { color: #fff; font-size: 28px; font-weight: 900; letter-spacing: -1px; }
     .logo span { color: var(--red); }
-    .header-actions { display: flex; gap: 10px; align-items: center; }
+    
+    /* MODIFICACIONES PARA EL NOMBRE DE USUARIO */
+    .header-actions { display: flex; flex-direction: column; align-items: flex-end; }
+    #user-name-display { font-size: 9px; color: var(--gray); font-weight: 900; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .header-actions-row { display: flex; gap: 10px; align-items: center; }
+    
     #auth-btn { background: var(--input); border: 1px solid var(--border); color: #fff; padding: 8px 12px; border-radius: 12px; font-size: 10px; font-weight: 900; display: flex; align-items: center; gap: 6px; }
     #auth-btn.logged-in { border-color: var(--green); color: var(--green); }
     #menu-btn { background: transparent; border: none; color: #fff; font-size: 20px; padding: 5px; cursor: pointer; }
     
-    .dropdown-menu { position: absolute; top: 75px; right: 20px; background: var(--card); border: 1px solid var(--border); border-radius: 15px; padding: 10px; display: none; flex-direction: column; gap: 5px; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.9); }
+    .dropdown-menu { position: absolute; top: 85px; right: 20px; background: var(--card); border: 1px solid var(--border); border-radius: 15px; padding: 10px; display: none; flex-direction: column; gap: 5px; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.9); }
     .dropdown-menu.active { display: flex; }
     .dropdown-menu button { background: transparent; border: none; color: #fff; padding: 12px 15px; text-align: left; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 12px; border-radius: 8px; cursor: pointer; }
     .dropdown-menu button:hover { background: var(--input); }
@@ -288,8 +296,6 @@
     let tokenClient, gapiInited = false, gisInited = false, driveFileId = null;
     let records = [], currentFilter = 'Todos', sortBy = 'FECHA', sortAsc = false, showAll = false;
     let currentMonth = new Date().toISOString().substring(0, 7);
-    
-    // NUEVAS VARIABLES PARA EL RANGO DE FECHAS
     let dateFrom = '', dateTo = '';
     let myChartBilling = null, myChartStatus = null;
 
@@ -308,15 +314,36 @@
 
     async function checkAuth() {
         const token = localStorage.getItem('g_token');
-        if(token) { gapi.client.setToken({access_token: token}); updateAuthUI(true); syncData(); } 
+        if(token) { 
+            gapi.client.setToken({access_token: token}); 
+            updateAuthUI(true); 
+            syncData(); 
+            fetchUserInfo(); 
+        } 
         else { render(); }
+    }
+
+    // FUNCION PARA OBTENER EL NOMBRE DE GOOGLE
+    async function fetchUserInfo() {
+        try {
+            const res = await gapi.client.drive.about.get({ fields: 'user' });
+            if (res.result && res.result.user) {
+                document.getElementById('user-name-display').innerText = 'HOLA, ' + res.result.user.displayName;
+            }
+        } catch (e) {
+            console.log("No se pudo obtener el nombre del usuario");
+        }
     }
 
     function updateAuthUI(logged) { 
         const btn = document.getElementById('auth-btn');
         const textSpan = document.getElementById('auth-text');
-        if(logged) { btn.classList.add('logged-in'); textSpan.innerText = 'CERRAR SESIÓN'; } 
-        else { btn.classList.remove('logged-in'); textSpan.innerText = 'INICIAR SESIÓN'; }
+        if(logged) { 
+            btn.classList.add('logged-in'); textSpan.innerText = 'CERRAR SESIÓN'; 
+        } else { 
+            btn.classList.remove('logged-in'); textSpan.innerText = 'INICIAR SESIÓN'; 
+            document.getElementById('user-name-display').innerText = ''; 
+        }
     }
 
     function handleAuthClick() {
@@ -328,7 +355,7 @@
             tokenClient.callback = async (r) => { 
                 if(r.error) return; 
                 localStorage.setItem('g_token', r.access_token); 
-                updateAuthUI(true); syncData(); 
+                updateAuthUI(true); syncData(); fetchUserInfo();
             };
             tokenClient.requestAccessToken({prompt: gapi.client.getToken() ? '' : 'consent'});
         }
@@ -380,9 +407,7 @@
         dateFrom = document.getElementById('filter-desde').value;
         dateTo = document.getElementById('filter-hasta').value;
         if(!dateFrom || !dateTo) return alert("Por favor, seleccioná ambas fechas.");
-        showAll = false; 
-        render(); 
-        closeFilters();
+        showAll = false; render(); closeFilters();
     }
 
     function clearDateRange() {
@@ -397,7 +422,6 @@
     function closeDashboard() { document.getElementById('modal-dashboard').classList.remove('active'); }
 
     function processAnalytics() {
-        // Filtrar datos para el dashboard usando el rango de fechas actual
         let dataDash = records;
         if (dateFrom && dateTo) {
             dataDash = dataDash.filter(r => r.fecha >= dateFrom && r.fecha <= dateTo);
@@ -447,7 +471,6 @@
         const searchVal = document.getElementById('main-search').value.toLowerCase();
         let data = records;
 
-        // APLICAR RANGO DE FECHAS O MES ACTUAL
         if (dateFrom && dateTo) {
             data = data.filter(r => r.fecha >= dateFrom && r.fecha <= dateTo);
             document.getElementById('current-month-display').innerText = `${dateFrom.split('-').reverse().join('/').substring(0,5)} al ${dateTo.split('-').reverse().join('/').substring(0,5)}`;
@@ -504,9 +527,9 @@
         document.getElementById('total-monto').innerText = '$' + total.toLocaleString('es-AR', {minimumFractionDigits: 2});
     }
 
-    function toggleAllMonths() { showAll = !showAll; clearDateRange(); } // Al tocar historial, se limpia rango
+    function toggleAllMonths() { showAll = !showAll; clearDateRange(); }
     function changeMonth(d) {
-        clearDateRange(); // Al cambiar mes manual, se limpia el rango
+        clearDateRange();
         let [y, m] = currentMonth.split('-').map(Number);
         m += d; if(m>12){m=1;y++} else if(m<1){m=12;y--}
         currentMonth = `${y}-${String(m).padStart(2,'0')}`; showAll = false; render();

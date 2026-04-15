@@ -193,7 +193,6 @@
     .loader { border: 4px solid #111; border-top: 4px solid var(--red); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 </style>
-
 <script>
     const API_KEY = 'AIzaSyCg2T_OVIV0C6Lmx-JCmV67nLiQDAwqbss';
     const CLIENT_ID = '474241917322-l7ub2cma675eat9g7ht2q8po09a15qhl.apps.googleusercontent.com';
@@ -218,7 +217,7 @@
         if(gapiInited && gisInited) {
             const btn = document.getElementById('auth-btn');
             btn.classList.add('ready');
-            document.getElementById('auth-text').innerText = 'CONECTAR';
+            document.getElementById('auth-text').innerText = 'INICIAR SESIÓN';
             checkAuth();
         }
     }
@@ -229,19 +228,37 @@
         else { render(); }
     }
 
-    function handleAuthClick() {
-        if (!gisInited || !tokenClient) return;
-        tokenClient.callback = async (r) => { 
-            if(r.error) return; 
-            localStorage.setItem('g_token', r.access_token); 
-            updateAuthUI(true); syncData(); 
-        };
-        tokenClient.requestAccessToken({prompt: gapi.client.getToken() ? '' : 'consent'});
-    }
-
     function updateAuthUI(logged) { 
         const btn = document.getElementById('auth-btn');
-        if(logged) { btn.classList.add('logged-in'); document.getElementById('auth-text').innerText = 'EN LA NUBE'; } 
+        const textSpan = document.getElementById('auth-text');
+        if(logged) { 
+            btn.classList.add('logged-in'); 
+            textSpan.innerText = 'CERRAR SESIÓN'; 
+        } else {
+            btn.classList.remove('logged-in'); 
+            textSpan.innerText = 'INICIAR SESIÓN'; 
+        }
+    }
+
+    function handleAuthClick() {
+        const token = localStorage.getItem('g_token');
+        if (token) {
+            localStorage.removeItem('g_token');
+            gapi.client.setToken(null);
+            records = [];
+            driveFileId = null;
+            updateAuthUI(false);
+            render();
+        } else {
+            if (!gisInited || !tokenClient) return;
+            tokenClient.callback = async (r) => { 
+                if(r.error) return; 
+                localStorage.setItem('g_token', r.access_token); 
+                updateAuthUI(true); 
+                syncData(); 
+            };
+            tokenClient.requestAccessToken({prompt: gapi.client.getToken() ? '' : 'consent'});
+        }
     }
 
     async function syncData() {
@@ -339,48 +356,34 @@
     }
 
     function toggleAllMonths() { showAll = !showAll; render(); }
-    
     function changeMonth(d) {
         let [y, m] = currentMonth.split('-').map(Number);
         m += d; if(m>12){m=1;y++} else if(m<1){m=12;y--}
         currentMonth = `${y}-${String(m).padStart(2,'0')}`; showAll = false; render();
     }
-    
     function setFilter(f) { 
         currentFilter = f; 
         document.querySelectorAll('.chip-filter').forEach(c => c.classList.remove('active')); 
         document.getElementById(`f-${f}`).classList.add('active'); 
         render(); 
     }
-    
     function setSort(s) {
-        if (sortBy === s) {
-            sortAsc = !sortAsc;
-        } else {
-            sortBy = s;
-            sortAsc = false;
-        }
-
+        if (sortBy === s) { sortAsc = !sortAsc; } 
+        else { sortBy = s; sortAsc = false; }
         document.querySelectorAll('.chip-sort').forEach(chip => {
             chip.classList.remove('active');
             let textoLimpio = chip.innerText.replace(' ↑', '').replace(' ↓', '');
-            
             if (chip.id === `sort-${s}`) {
                 chip.classList.add('active');
                 chip.innerText = textoLimpio + (sortAsc ? ' ↑' : ' ↓');
-            } else {
-                chip.innerText = textoLimpio;
-            }
+            } else { chip.innerText = textoLimpio; }
         });
-
         render();
     }
-
     function openForm(id = null) {
         document.getElementById('btn-del').style.display = id ? 'block' : 'none';
         const btnConc = document.getElementById('f-conciliado');
         const btnCob = document.getElementById('f-cobrado');
-
         if(id) {
             const r = records.find(x => x.id === id);
             document.getElementById('f-id').value = r.id; 
@@ -390,7 +393,6 @@
             document.getElementById('f-patente').value = r.patente; 
             document.getElementById('f-motivo').value = r.motivo; 
             document.getElementById('f-estado').value = r.estado;
-
             btnConc.innerText = r.conciliado || 'NO';
             btnConc.className = 'toggle-btn ' + (r.conciliado === 'SI' ? 'si' : 'no');
             btnCob.innerText = r.cobrado || 'NO';
@@ -403,18 +405,14 @@
             document.getElementById('f-patente').value = ''; 
             document.getElementById('f-motivo').value = ''; 
             document.getElementById('f-estado').value = 'Pendiente';
-
             btnConc.innerText = 'NO'; btnConc.className = 'toggle-btn no';
             btnCob.innerText = 'NO'; btnCob.className = 'toggle-btn no';
         }
         document.getElementById('modal-form').classList.add('active');
     }
-
     function closeForm() { document.getElementById('modal-form').classList.remove('active'); }
-
     function openConfirm() { document.getElementById('modal-confirm').classList.add('active'); }
     function closeConfirm() { document.getElementById('modal-confirm').classList.remove('active'); }
-
     async function saveRecord() {
         const id = document.getElementById('f-id').value;
         const data = { 
@@ -431,13 +429,10 @@
         if(id) records = records.map(r => r.id === id ? data : r); else records.push(data);
         closeForm(); render(); await saveToDrive();
     }
-
     async function confirmDelete() { 
         closeConfirm();
         records = records.filter(r => r.id !== document.getElementById('f-id').value); 
-        closeForm(); 
-        render(); 
-        await saveToDrive(); 
+        closeForm(); render(); await saveToDrive(); 
     }
 </script>
 </body>

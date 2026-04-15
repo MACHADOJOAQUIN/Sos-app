@@ -95,12 +95,22 @@
                 </div>
 
                 <button class="btn-save" onclick="saveRecord()">✓ GUARDAR CAMBIOS</button>
-                <button id="btn-del" class="btn-del-danger" onclick="deleteRecord()">BORRAR REGISTRO</button>
+                <button id="btn-del" class="btn-del-danger" onclick="openConfirm()">BORRAR REGISTRO</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-confirm">
+        <div class="confirm-box">
+            <h3>¿ELIMINAR REGISTRO?</h3>
+            <p>Esta acción no se puede deshacer y se borrará de tu nube.</p>
+            <div class="confirm-actions">
+                <button class="btn-cancel" onclick="closeConfirm()">CANCELAR</button>
+                <button class="btn-confirm-del" onclick="confirmDelete()">ELIMINAR</button>
             </div>
         </div>
     </div>
 </div>
-
 <style>
     :root {
         --bg: #000; --card: #111; --input: #1a1a1a; --border: #262626;
@@ -158,7 +168,6 @@
     .input-group label { display: block; color: var(--gray); font-size: 10px; font-weight: 900; margin-bottom: 8px; }
     .input-group input, .input-group select { width: 100%; background: var(--input); border: 1px solid var(--border); color: #fff; padding: 16px; border-radius: 14px; outline: none; font-size: 16px; font-weight: 700; }
     
-    /* Estilos nuevos de los botones Conciliado/Cobrado */
     .toggle-row { display: flex; justify-content: space-between; align-items: center; background: var(--input); padding: 16px 20px; border-radius: 14px; margin-bottom: 15px; border: 1px solid var(--border); }
     .toggle-row span { color: #fff; font-size: 14px; font-weight: 700; }
     .toggle-btn { padding: 8px 16px; border-radius: 8px; border: none; font-weight: 900; font-size: 13px; cursor: pointer; transition: 0.3s; }
@@ -168,11 +177,22 @@
     .btn-save { width: 100%; background: var(--red); color: #fff; border: none; padding: 22px; border-radius: 18px; font-size: 16px; font-weight: 900; margin-top: 15px; }
     .btn-del-danger { width: 100%; background: rgba(225, 29, 72, 0.1); color: var(--red); border: 1px solid var(--red); padding: 15px; border-radius: 15px; font-weight: bold; margin-top: 15px; }
 
+    /* ESTILOS DEL NUEVO CARTEL DE CONFIRMACIÓN */
+    #modal-confirm { align-items: center; justify-content: center; z-index: 2000; }
+    .confirm-box { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 30px; width: 85%; max-width: 350px; text-align: center; transform: scale(0.9); opacity: 0; transition: 0.3s; }
+    #modal-confirm.active .confirm-box { transform: scale(1); opacity: 1; }
+    .confirm-box h3 { color: var(--red); font-size: 20px; font-weight: 900; margin-bottom: 10px; }
+    .confirm-box p { color: var(--gray); font-size: 13px; margin-bottom: 25px; line-height: 1.5; }
+    .confirm-actions { display: flex; gap: 15px; }
+    .confirm-actions button { flex: 1; padding: 16px; border-radius: 14px; font-weight: 900; font-size: 14px; border: none; cursor: pointer; }
+    .btn-cancel { background: var(--input); color: #fff; border: 1px solid var(--border) !important; }
+    .btn-confirm-del { background: var(--red); color: #fff; }
+
     #loading-overlay { position: fixed; inset: 0; background: #000; display: none; z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
     .loader { border: 4px solid #111; border-top: 4px solid var(--red); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
-                </style>
-    <script>
+                            </style>
+                            <script>
     const API_KEY = 'AIzaSyCg2T_OVIV0C6Lmx-JCmV67nLiQDAwqbss';
     const CLIENT_ID = '474241917322-l7ub2cma675eat9g7ht2q8po09a15qhl.apps.googleusercontent.com';
     const DB_NAME = 'sos_database_vFINAL_CORREGIDA.json';
@@ -253,7 +273,6 @@
         } catch(e) { console.error(e); }
     }
 
-    // Funciones visuales nuevas
     function toggleBtn(btn) {
         if(btn.innerText === 'NO') {
             btn.innerText = 'SI';
@@ -285,8 +304,6 @@
         
         data.forEach(r => {
             const color = r.estado === 'Terminado' ? 'var(--green)' : (r.estado === 'En Curso' ? 'var(--blue)' : 'var(--red)');
-            
-            // Lógica para etiquetas visuales en la tarjeta
             const concBadge = r.conciliado === 'SI' ? '<span class="badge" style="background:rgba(59, 130, 246, 0.2);color:var(--blue); border: 1px solid var(--blue)">Concil.</span>' : '';
             const cobBadge = r.cobrado === 'SI' ? '<span class="badge" style="background:rgba(16, 185, 129, 0.2);color:var(--green); border: 1px solid var(--green)">Cobrado</span>' : '';
             const extraBadges = (concBadge || cobBadge) ? `<div style="display:flex;gap:5px;margin-top:8px;">${concBadge}${cobBadge}</div>` : '';
@@ -357,6 +374,10 @@
 
     function closeForm() { document.getElementById('modal-form').classList.remove('active'); }
 
+    // --- NUEVAS FUNCIONES PARA EL CARTEL DE BORRAR ---
+    function openConfirm() { document.getElementById('modal-confirm').classList.add('active'); }
+    function closeConfirm() { document.getElementById('modal-confirm').classList.remove('active'); }
+
     async function saveRecord() {
         const id = document.getElementById('f-id').value;
         const data = { 
@@ -374,7 +395,13 @@
         closeForm(); render(); await saveToDrive();
     }
 
-    async function deleteRecord() { if(!confirm('¿Eliminar?')) return; records = records.filter(r => r.id !== document.getElementById('f-id').value); closeForm(); render(); await saveToDrive(); }
+    async function confirmDelete() { 
+        closeConfirm();
+        records = records.filter(r => r.id !== document.getElementById('f-id').value); 
+        closeForm(); 
+        render(); 
+        await saveToDrive(); 
+    }
 </script>
 </body>
 </html>

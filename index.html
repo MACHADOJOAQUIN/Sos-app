@@ -6,19 +6,22 @@
     <title>SOS App Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
 </head>
 <body>
 
 <div id="loading-overlay">
     <div class="loader"></div>
-    <p>SINCRONIZANDO...</p>
+    <p>SINCRO DRIVE...</p>
 </div>
 
 <div id="app-container">
     <header>
         <div class="logo">SOS</div>
         <button id="auth-btn" onclick="handleAuthClick()">
-            <i class="fa-brands fa-google"></i> <span id="auth-text">CONECTAR</span>
+            <i class="fa-brands fa-google"></i> <span id="auth-text">CARGANDO...</span>
         </button>
     </header>
 
@@ -49,7 +52,7 @@
 
     <footer>
         <div class="total-box">
-            <span id="total-label">TOTAL DEL MES</span>
+            <span id="total-label">RESUMEN TOTAL</span>
             <div class="total-amount" id="total-monto">$0,00</div>
         </div>
         <button class="fab" onclick="openForm()">
@@ -61,7 +64,7 @@
         <div class="bottom-sheet">
             <div class="sheet-header">
                 <button class="btn-close" onclick="closeForm()"><i class="fa-solid fa-xmark"></i></button>
-                <div class="sheet-title" id="form-title">REGISTRO</div>
+                <div class="sheet-title">REGISTRO SOS</div>
             </div>
             <div class="sheet-body">
                 <input type="hidden" id="f-id">
@@ -72,6 +75,7 @@
                 </div>
                 <div class="input-group"><label>PATENTE / VEHÍCULO</label><input type="text" id="f-patente"></div>
                 <div class="input-group"><label>MOTIVO / DETALLE</label><input type="text" id="f-motivo"></div>
+                
                 <div class="input-group">
                     <label>ESTADO</label>
                     <select id="f-estado">
@@ -80,16 +84,27 @@
                         <option value="Terminado">TERMINADO</option>
                     </select>
                 </div>
+
+                <div class="toggle-row">
+                    <span>Conciliado</span>
+                    <button type="button" id="f-conciliado" class="toggle-btn no" onclick="toggleBtn(this)">NO</button>
+                </div>
+                <div class="toggle-row">
+                    <span>Cobrado</span>
+                    <button type="button" id="f-cobrado" class="toggle-btn no" onclick="toggleBtn(this)">NO</button>
+                </div>
+
                 <button class="btn-save" onclick="saveRecord()">✓ GUARDAR CAMBIOS</button>
-                <button id="btn-del" class="btn-del-danger" onclick="deleteRecord()">ELIMINAR</button>
+                <button id="btn-del" class="btn-del-danger" onclick="deleteRecord()">BORRAR REGISTRO</button>
             </div>
         </div>
     </div>
 </div>
+
 <style>
     :root {
         --bg: #000; --card: #111; --input: #1a1a1a; --border: #262626;
-        --red: #e11d48; --green: #10b981; --text: #fff; --gray: #71717a;
+        --red: #e11d48; --blue: #3b82f6; --green: #10b981; --text: #fff; --gray: #71717a;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; -webkit-tap-highlight-color: transparent; }
     
@@ -99,15 +114,15 @@
     header { padding: 35px 20px 10px; display: flex; justify-content: space-between; align-items: center; min-height: 90px; }
     .logo { color: var(--red); font-size: 38px; font-weight: 900; font-style: italic; letter-spacing: 1px; }
     
-    /* Botón de conectar más grande para el touch */
-    #auth-btn { background: var(--input); border: 1px solid var(--border); color: #fff; padding: 12px 18px; border-radius: 14px; font-size: 11px; font-weight: 900; display: flex; align-items: center; gap: 8px; z-index: 50; }
+    #auth-btn { background: var(--input); border: 1px solid var(--border); color: #fff; padding: 12px 18px; border-radius: 14px; font-size: 11px; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+    #auth-btn.ready { border-color: #444; }
     #auth-btn.logged-in { border-color: var(--green); color: var(--green); }
 
     .time-bar { padding: 5px 20px 10px; display: flex; gap: 10px; }
     .month-nav { flex: 1; background: var(--input); border: 1px solid var(--border); border-radius: 16px; display: flex; justify-content: space-between; align-items: center; padding: 5px; }
     .month-nav button { background: transparent; border: none; color: var(--gray); padding: 8px 15px; font-size: 18px; }
     #current-month-display { font-size: 14px; font-weight: 900; text-transform: uppercase; }
-    #btn-toggle-all { background: var(--input); border: 1px solid var(--border); color: var(--gray); width: 50px; border-radius: 16px; }
+    #btn-toggle-all { background: var(--input); border: 1px solid var(--border); color: var(--gray); width: 50px; border-radius: 16px; font-size: 18px; }
     #btn-toggle-all.active { color: var(--red); border-color: var(--red); }
 
     .scroll-bar { display: flex; overflow-x: auto; padding: 5px 20px 10px; gap: 8px; scrollbar-width: none; }
@@ -126,19 +141,11 @@
     .card-price { font-size: 24px; font-weight: 900; letter-spacing: -1px; }
     .card-mid { display: flex; gap: 12px; color: var(--gray); font-size: 12px; font-weight: 600; }
 
-    /* FOOTER CORREGIDO PARA IPHONE */
-    footer { 
-        position: absolute; bottom: 0; width: 100%; 
-        background: rgba(0,0,0,0.9); backdrop-filter: blur(20px); 
-        padding: 20px 25px calc(45px + env(safe-area-inset-bottom)); 
-        border-top: 1px solid var(--border); 
-        display: flex; justify-content: space-between; align-items: center; z-index: 100; 
-    }
+    footer { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); padding: 20px 25px calc(55px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
     #total-label { color: var(--gray); font-size: 11px; font-weight: 900; letter-spacing: 1px; }
-    .total-amount { font-size: 34px; font-weight: 900; letter-spacing: -1.5px; }
-    .fab { background: var(--red); width: 70px; height: 62px; border-radius: 22px; border: none; color: #fff; font-size: 30px; box-shadow: 0 10px 25px rgba(225, 29, 72, 0.4); }
+    .total-amount { font-size: 36px; font-weight: 900; letter-spacing: -1.5px; }
+    .fab { background: var(--red); width: 72px; height: 64px; border-radius: 22px; border: none; color: #fff; font-size: 32px; box-shadow: 0 10px 25px rgba(225, 29, 72, 0.4); }
 
-    /* Modal */
     .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; display: flex; align-items: flex-end; }
     .modal-overlay.active { opacity: 1; pointer-events: auto; }
     .bottom-sheet { width: 100%; height: 94%; background: #000; border-radius: 35px 35px 0 0; transform: translateY(100%); transition: 0.4s cubic-bezier(0, 1, 0.5, 1); padding: 30px; border-top: 1px solid var(--border); overflow-y: auto; }
@@ -150,35 +157,58 @@
     .input-group { margin-bottom: 20px; flex: 1; }
     .input-group label { display: block; color: var(--gray); font-size: 10px; font-weight: 900; margin-bottom: 8px; }
     .input-group input, .input-group select { width: 100%; background: var(--input); border: 1px solid var(--border); color: #fff; padding: 16px; border-radius: 14px; outline: none; font-size: 16px; font-weight: 700; }
-    .btn-save { width: 100%; background: var(--red); color: #fff; border: none; padding: 22px; border-radius: 18px; font-size: 16px; font-weight: 900; margin-top: 10px; }
+    
+    /* Estilos nuevos de los botones Conciliado/Cobrado */
+    .toggle-row { display: flex; justify-content: space-between; align-items: center; background: var(--input); padding: 16px 20px; border-radius: 14px; margin-bottom: 15px; border: 1px solid var(--border); }
+    .toggle-row span { color: #fff; font-size: 14px; font-weight: 700; }
+    .toggle-btn { padding: 8px 16px; border-radius: 8px; border: none; font-weight: 900; font-size: 13px; cursor: pointer; transition: 0.3s; }
+    .toggle-btn.no { background: var(--red); color: white; }
+    .toggle-btn.si { background: var(--green); color: white; }
+
+    .btn-save { width: 100%; background: var(--red); color: #fff; border: none; padding: 22px; border-radius: 18px; font-size: 16px; font-weight: 900; margin-top: 15px; }
     .btn-del-danger { width: 100%; background: rgba(225, 29, 72, 0.1); color: var(--red); border: 1px solid var(--red); padding: 15px; border-radius: 15px; font-weight: bold; margin-top: 15px; }
 
     #loading-overlay { position: fixed; inset: 0; background: #000; display: none; z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
     .loader { border: 4px solid #111; border-top: 4px solid var(--red); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
-</style>
-<script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
-<script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
-
-<script>
+                </style>
+    <script>
     const API_KEY = 'AIzaSyCg2T_OVIV0C6Lmx-JCmV67nLiQDAwqbss';
     const CLIENT_ID = '474241917322-l7ub2cma675eat9g7ht2q8po09a15qhl.apps.googleusercontent.com';
-    const DB_NAME = 'sos_final_database_vFINAL.json';
+    const DB_NAME = 'sos_database_vFINAL_CORREGIDA.json';
 
     let tokenClient, gapiInited = false, gisInited = false, driveFileId = null;
     let records = [], currentFilter = 'Todos', sortBy = 'FECHA', sortAsc = false, showAll = false;
     let currentMonth = new Date().toISOString().substring(0, 7);
 
-    function gapiLoaded() { gapi.load('client', async () => { await gapi.client.init({apiKey: API_KEY, discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']}); gapiInited = true; checkAuth(); }); }
-    function gisLoaded() { tokenClient = google.accounts.oauth2.initTokenClient({client_id: CLIENT_ID, scope: 'https://www.googleapis.com/auth/drive.file', callback: ''}); gisInited = true; }
+    window.onload = function() {
+        gapi.load('client', async () => {
+            await gapi.client.init({apiKey: API_KEY, discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']});
+            gapiInited = true; checkReady();
+        });
+        tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: CLIENT_ID, scope: 'https://www.googleapis.com/auth/drive.file', callback: ''
+        });
+        gisInited = true; checkReady();
+    };
+
+    function checkReady() {
+        if(gapiInited && gisInited) {
+            const btn = document.getElementById('auth-btn');
+            btn.classList.add('ready');
+            document.getElementById('auth-text').innerText = 'CONECTAR';
+            checkAuth();
+        }
+    }
 
     async function checkAuth() {
         const token = localStorage.getItem('g_token');
-        if(token) { gapi.client.setToken({access_token: token}); updateAuthUI(true); syncData(); } else { render(); }
+        if(token) { gapi.client.setToken({access_token: token}); updateAuthUI(true); syncData(); } 
+        else { render(); }
     }
 
     function handleAuthClick() {
-        if (!gisInited || !tokenClient) { alert("Cargando Google... Esperá 2 segundos."); return; }
+        if (!gisInited || !tokenClient) return;
         tokenClient.callback = async (r) => { 
             if(r.error) return; 
             localStorage.setItem('g_token', r.access_token); 
@@ -223,21 +253,28 @@
         } catch(e) { console.error(e); }
     }
 
+    // Funciones visuales nuevas
+    function toggleBtn(btn) {
+        if(btn.innerText === 'NO') {
+            btn.innerText = 'SI';
+            btn.classList.remove('no'); btn.classList.add('si');
+        } else {
+            btn.innerText = 'NO';
+            btn.classList.remove('si'); btn.classList.add('no');
+        }
+    }
+
     function render() {
         const display = document.getElementById('current-month-display');
-        const btnAll = document.getElementById('btn-toggle-all');
-        const totalLabel = document.getElementById('total-label');
-        
-        if(showAll) { display.innerText = "Historial"; btnAll.classList.add('active'); totalLabel.innerText = "RESUMEN TOTAL"; }
-        else { display.innerText = currentMonth; btnAll.classList.remove('active'); totalLabel.innerText = "TOTAL DEL MES"; }
-
+        display.innerText = showAll ? "Historial" : currentMonth;
         let data = showAll ? records : records.filter(r => r.fecha.startsWith(currentMonth));
+        
         document.getElementById('c-Todos').innerText = data.length;
         document.getElementById('c-Pendiente').innerText = data.filter(x => x.estado === 'Pendiente').length;
         document.getElementById('c-Terminado').innerText = data.filter(x => x.estado === 'Terminado').length;
-
+        
         if(currentFilter !== 'Todos') data = data.filter(r => r.estado === currentFilter);
-
+        
         data.sort((a,b) => {
             let res = sortBy === 'FECHA' ? a.fecha.localeCompare(b.fecha) : (sortBy === 'MONTO' ? parseFloat(a.monto) - parseFloat(b.monto) : parseInt(a.servicio) - parseInt(b.servicio));
             return sortAsc ? res : -res;
@@ -248,12 +285,29 @@
         
         data.forEach(r => {
             const color = r.estado === 'Terminado' ? 'var(--green)' : (r.estado === 'En Curso' ? 'var(--blue)' : 'var(--red)');
+            
+            // Lógica para etiquetas visuales en la tarjeta
+            const concBadge = r.conciliado === 'SI' ? '<span class="badge" style="background:rgba(59, 130, 246, 0.2);color:var(--blue); border: 1px solid var(--blue)">Concil.</span>' : '';
+            const cobBadge = r.cobrado === 'SI' ? '<span class="badge" style="background:rgba(16, 185, 129, 0.2);color:var(--green); border: 1px solid var(--green)">Cobrado</span>' : '';
+            const extraBadges = (concBadge || cobBadge) ? `<div style="display:flex;gap:5px;margin-top:8px;">${concBadge}${cobBadge}</div>` : '';
+
             const div = document.createElement('div');
             div.className = 'card';
-            div.innerHTML = `<div class="card-accent" style="background:${color}"></div><div class="card-body" onclick="openForm('${r.id}')"><div class="card-top"><span class="card-id">#${r.servicio}</span><span class="card-price">$${parseFloat(r.monto).toLocaleString('es-AR')}</span></div><div class="card-mid"><i class="fa-solid fa-calendar-day"></i> ${r.fecha.split('-').reverse().join('/')} <i class="fa-solid fa-car-side"></i> ${r.patente || 'S/P'}</div></div>`;
+            div.innerHTML = `
+                <div class="card-accent" style="background:${color}"></div>
+                <div class="card-body" onclick="openForm('${r.id}')">
+                    <div class="card-top">
+                        <span class="card-id">#${r.servicio}</span>
+                        <span class="card-price">$${parseFloat(r.monto).toLocaleString('es-AR')}</span>
+                    </div>
+                    <div class="card-mid">
+                        <i class="fa-solid fa-calendar-day"></i> ${r.fecha.split('-').reverse().join('/')} 
+                        <i class="fa-solid fa-car-side"></i> ${r.patente || 'S/P'}
+                    </div>
+                    ${extraBadges}
+                </div>`;
             container.appendChild(div);
         });
-
         const total = data.reduce((s, r) => s + parseFloat(r.monto || 0), 0);
         document.getElementById('total-monto').innerText = '$' + total.toLocaleString('es-AR', {minimumFractionDigits: 2});
     }
@@ -265,15 +319,38 @@
         currentMonth = `${y}-${String(m).padStart(2,'0')}`; showAll = false; render();
     }
     function setFilter(f) { currentFilter = f; document.querySelectorAll('.chip-filter').forEach(c => c.classList.remove('active')); document.getElementById(`f-${f}`).classList.add('active'); render(); }
-    function setSort(s) { if(sortBy === s) sortAsc = !sortAsc; else { sortBy = s; sortAsc = false; } document.querySelectorAll('.chip-sort').forEach(c => c.classList.remove('active')); document.getElementById(`sort-${s}`).classList.add('active'); document.getElementById(`sort-${s}`).innerText = s + (sortAsc ? ' ↑' : ' ↓'); render(); }
+    function setSort(s) { if(sortBy === s) sortAsc = !sortAsc; else { sortBy = s; sortAsc = false; } document.querySelectorAll('.chip-sort').forEach(c => c.classList.remove('active')); document.getElementById(`sort-${s}`).classList.add('active'); render(); }
 
     function openForm(id = null) {
         document.getElementById('btn-del').style.display = id ? 'block' : 'none';
+        const btnConc = document.getElementById('f-conciliado');
+        const btnCob = document.getElementById('f-cobrado');
+
         if(id) {
             const r = records.find(x => x.id === id);
-            document.getElementById('f-id').value = r.id; document.getElementById('f-fecha').value = r.fecha; document.getElementById('f-servicio').value = r.servicio; document.getElementById('f-monto').value = r.monto; document.getElementById('f-patente').value = r.patente; document.getElementById('f-motivo').value = r.motivo; document.getElementById('f-estado').value = r.estado;
+            document.getElementById('f-id').value = r.id; 
+            document.getElementById('f-fecha').value = r.fecha; 
+            document.getElementById('f-servicio').value = r.servicio; 
+            document.getElementById('f-monto').value = r.monto; 
+            document.getElementById('f-patente').value = r.patente; 
+            document.getElementById('f-motivo').value = r.motivo; 
+            document.getElementById('f-estado').value = r.estado;
+            
+            btnConc.innerText = r.conciliado || 'NO';
+            btnConc.className = 'toggle-btn ' + (r.conciliado === 'SI' ? 'si' : 'no');
+            btnCob.innerText = r.cobrado || 'NO';
+            btnCob.className = 'toggle-btn ' + (r.cobrado === 'SI' ? 'si' : 'no');
         } else {
-            document.getElementById('f-id').value = ''; document.getElementById('f-fecha').value = new Date().toISOString().substring(0,10); document.getElementById('f-servicio').value = ''; document.getElementById('f-monto').value = ''; document.getElementById('f-patente').value = ''; document.getElementById('f-motivo').value = ''; document.getElementById('f-estado').value = 'Pendiente';
+            document.getElementById('f-id').value = ''; 
+            document.getElementById('f-fecha').value = new Date().toISOString().substring(0,10); 
+            document.getElementById('f-servicio').value = ''; 
+            document.getElementById('f-monto').value = ''; 
+            document.getElementById('f-patente').value = ''; 
+            document.getElementById('f-motivo').value = ''; 
+            document.getElementById('f-estado').value = 'Pendiente';
+            
+            btnConc.innerText = 'NO'; btnConc.className = 'toggle-btn no';
+            btnCob.innerText = 'NO'; btnCob.className = 'toggle-btn no';
         }
         document.getElementById('modal-form').classList.add('active');
     }
@@ -282,7 +359,17 @@
 
     async function saveRecord() {
         const id = document.getElementById('f-id').value;
-        const data = { id: id || Math.random().toString(36).substr(2, 9), fecha: document.getElementById('f-fecha').value, servicio: document.getElementById('f-servicio').value || '0', monto: document.getElementById('f-monto').value || 0, patente: document.getElementById('f-patente').value.toUpperCase(), motivo: document.getElementById('f-motivo').value, estado: document.getElementById('f-estado').value };
+        const data = { 
+            id: id || Math.random().toString(36).substr(2, 9), 
+            fecha: document.getElementById('f-fecha').value, 
+            servicio: document.getElementById('f-servicio').value || '0', 
+            monto: document.getElementById('f-monto').value || 0, 
+            patente: document.getElementById('f-patente').value.toUpperCase(), 
+            motivo: document.getElementById('f-motivo').value, 
+            estado: document.getElementById('f-estado').value,
+            conciliado: document.getElementById('f-conciliado').innerText,
+            cobrado: document.getElementById('f-cobrado').innerText
+        };
         if(id) records = records.map(r => r.id === id ? data : r); else records.push(data);
         closeForm(); render(); await saveToDrive();
     }

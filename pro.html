@@ -26,7 +26,7 @@
             <div id="user-name-display"></div>
             <div class="header-actions-row">
                 <button id="auth-btn" onclick="handleAuthClick()">
-                    <i class="fa-brands fa-google"></i> <span id="auth-text">...</span>
+                    <i class="fa-brands fa-google"></i> <span id="auth-text">INICIAR SESIÓN</span>
                 </button>
                 <button id="menu-btn" onclick="toggleMenu()">
                     <i class="fa-solid fa-ellipsis-vertical"></i>
@@ -186,7 +186,6 @@
 
 <div id="pdf-wrapper" style="position: absolute; left: -9999px; top: 0;">
     <div id="pdf-template" style="width: 800px; padding: 50px; background: white; color: black; font-family: 'Roboto', sans-serif;">
-        
         <div style="border-bottom: 3px solid #e11d48; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end;">
             <div>
                 <h1 style="color: #e11d48; margin: 0; font-size: 42px; font-style: italic; font-weight: 900; letter-spacing: -1px;">RED<span style="color: #000;">SOS</span></h1>
@@ -197,7 +196,6 @@
                 <p style="margin: 5px 0 0 0; font-size: 16px; color: #555;">Servicio N° <span id="pdf-nro" style="font-weight: bold; color: #000;"></span></p>
             </div>
         </div>
-
         <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
             <div style="background: #f4f4f5; padding: 15px 20px; border-radius: 10px; width: 48%;">
                 <p style="margin: 0 0 5px 0; font-size: 12px; color: #71717a; font-weight: bold;">FECHA DEL SERVICIO</p>
@@ -208,56 +206,40 @@
                 <p style="margin: 0; font-size: 18px; font-weight: 900;" id="pdf-estado"></p>
             </div>
         </div>
-
         <h3 style="color: #e11d48; border-bottom: 1px solid #e4e4e7; padding-bottom: 10px; font-size: 16px;">DATOS DEL VEHÍCULO Y SERVICIO</h3>
-        
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px; font-size: 15px;">
-            <tr>
-                <td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a; font-weight: bold; width: 30%;">Vehículo:</td>
-                <td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; font-weight: 900;" id="pdf-vehiculo"></td>
-            </tr>
-            <tr>
-                <td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a; font-weight: bold;">Dominio (Patente):</td>
-                <td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; font-weight: 900;" id="pdf-patente"></td>
-            </tr>
-            <tr>
-                <td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a; font-weight: bold;">Kilómetros de ruta:</td>
-                <td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; font-weight: 900;" id="pdf-km"></td>
-            </tr>
-            <tr>
-                <td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a; font-weight: bold; vertical-align: top;">Motivo / Detalle:</td>
-                <td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; font-weight: 900;" id="pdf-motivo"></td>
-            </tr>
+            <tr><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a; font-weight: bold; width: 30%;">Vehículo:</td><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; font-weight: 900;" id="pdf-vehiculo"></td></tr>
+            <tr><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a; font-weight: bold;">Dominio (Patente):</td><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; font-weight: 900;" id="pdf-patente"></td></tr>
+            <tr><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a; font-weight: bold;">Kilómetros:</td><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; font-weight: 900;" id="pdf-km"></td></tr>
+            <tr><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a; font-weight: bold; vertical-align: top;">Motivo / Detalle:</td><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; font-weight: 900;" id="pdf-motivo"></td></tr>
         </table>
-
         <div style="display: flex; justify-content: flex-end;">
             <div style="background: #111; color: white; padding: 20px 30px; border-radius: 12px; width: 350px; text-align: right;">
                 <p style="margin: 0 0 5px 0; font-size: 14px; color: #a1a1aa;">TOTAL A ABONAR</p>
                 <p style="margin: 0; font-size: 32px; font-weight: 900; letter-spacing: -1px;" id="pdf-monto"></p>
             </div>
         </div>
-
         <div style="margin-top: 60px; text-align: center; color: #71717a; font-size: 12px;">
             <p>Gracias por confiar en Red SOS. Documento generado automáticamente.</p>
         </div>
     </div>
 </div>
-
 <style>
     :root { --bg: #000; --card: #111; --input: #1a1a1a; --border: #262626; --red: #e11d48; --blue: #3b82f6; --green: #10b981; --gray: #71717a; }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background: #000; color: #fff; height: 100dvh; overflow: hidden; display: flex; justify-content: center; }
     #app-container { width: 100%; max-width: 500px; height: 100%; display: flex; flex-direction: column; position: relative; }
 
+    /* HEADER Y MENÚ DESPLEGABLE */
     header { padding: 30px 20px 10px; display: flex; justify-content: space-between; align-items: center; position: relative; }
     .logo { color: #fff; font-size: 28px; font-weight: 900; letter-spacing: -1px; }
     .logo span { color: var(--red); }
     
     .header-actions { display: flex; flex-direction: column; align-items: flex-end; }
-    #user-name-display { font-size: 9px; color: var(--gray); font-weight: 900; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .header-actions-row { display: flex; gap: 10px; align-items: center; }
+    #user-name-display { font-size: 9px; color: var(--blue); font-weight: 900; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .header-actions-row { display: flex; gap: 8px; align-items: center; }
     
-    #auth-btn { background: var(--input); border: 1px solid var(--border); color: #fff; padding: 8px 12px; border-radius: 12px; font-size: 10px; font-weight: 900; display: flex; align-items: center; gap: 6px; }
+    #auth-btn { background: var(--input); border: 1px solid var(--border); color: #fff; padding: 8px 12px; border-radius: 12px; font-size: 11px; font-weight: 900; display: flex; align-items: center; gap: 6px; cursor: pointer; }
     #auth-btn.logged-in { border-color: var(--green); color: var(--green); }
     #menu-btn { background: transparent; border: none; color: #fff; font-size: 20px; padding: 5px; cursor: pointer; }
     
@@ -267,6 +249,7 @@
     .dropdown-menu button:hover { background: var(--input); }
     .dropdown-menu i { color: var(--gray); font-size: 16px; }
 
+    /* CONTROLES PRINCIPALES */
     .search-container { padding: 10px 20px; }
     .search-box { background: var(--input); border: 1px solid var(--border); border-radius: 15px; padding: 12px 15px; display: flex; align-items: center; gap: 10px; }
     .search-box input { background: transparent; border: none; color: #fff; outline: none; width: 100%; font-size: 14px; }
@@ -293,6 +276,7 @@
     .chip-sort.active { background: #fff; color: #000; border-color: #fff; }
     .badge { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 6px; font-size: 10px; }
 
+    /* TARJETAS DE SERVICIOS */
     main { flex: 1; overflow-y: auto; padding: 5px 20px 180px; }
     .card { background: var(--card); border-radius: 20px; border: 1px solid var(--border); margin-bottom: 12px; display: flex; overflow: hidden; cursor: pointer; transition: 0.2s; }
     .card-accent { width: 6px; }
@@ -303,10 +287,12 @@
     .card-mid { color: var(--gray); font-size: 12px; font-weight: 600; line-height: 1.4; }
     .card-km { color: var(--blue); font-weight: 900; margin-left: 5px; }
 
+    /* FOOTER */
     footer { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); padding: 20px 25px calc(30px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
     .total-amount { font-size: 32px; font-weight: 900; letter-spacing: -1px; }
     .fab { background: var(--red); width: 65px; height: 65px; border-radius: 20px; border: none; color: #fff; font-size: 28px; box-shadow: 0 10px 25px rgba(225, 29, 72, 0.4); cursor: pointer; }
 
+    /* MODALES GENÉRICOS */
     .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; display: flex; align-items: flex-end; }
     .modal-overlay.active { opacity: 1; pointer-events: auto; }
     .bottom-sheet { width: 100%; height: 92%; background: #000; border-radius: 30px 30px 0 0; transform: translateY(100%); transition: 0.4s; padding: 25px; border-top: 1px solid var(--border); overflow-y: auto; }
@@ -316,6 +302,7 @@
     .sheet-title { flex: 1; text-align: center; font-weight: 900; font-size: 18px; color: var(--red); margin-right: 45px; }
     .full-height { height: 95% !important; }
 
+    /* DASHBOARD ESTILOS */
     .analytics-grid { display: flex; gap: 10px; margin-bottom: 20px; }
     .metric-mini { flex: 1; background: var(--input); padding: 15px; border-radius: 15px; border: 1px solid var(--border); }
     .m-label { display: block; color: var(--gray); font-size: 8px; font-weight: 900; margin-bottom: 4px; }
@@ -323,6 +310,7 @@
     .chart-box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; }
     .chart-box h3 { font-size: 12px; color: var(--gray); margin-bottom: 15px; font-weight: 900; text-align: center; }
 
+    /* FORMULARIOS */
     .row-inputs { display: flex; gap: 10px; }
     .input-group { flex: 1; }
     .input-group label { display: block; color: var(--gray); font-size: 10px; font-weight: 900; margin-bottom: 5px; text-transform: uppercase; }
@@ -336,6 +324,7 @@
     .btn-cancel { background: transparent; color: var(--gray); border: 1px solid var(--border); cursor: pointer; }
     .btn-del-danger { width: 100%; background: transparent; color: var(--red); border: 1px solid var(--red); padding: 15px; border-radius: 15px; margin-top: 15px; font-weight: bold; cursor: pointer; text-align: center; }
 
+    /* CARTEL CONFIRMAR */
     #modal-confirm { align-items: center; justify-content: center; }
     .confirm-box { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 30px; width: 85%; max-width: 350px; text-align: center; transform: scale(0.9); opacity: 0; transition: 0.3s; }
     #modal-confirm.active .confirm-box { transform: scale(1); opacity: 1; }
@@ -345,11 +334,11 @@
     .confirm-actions button { flex: 1; padding: 16px; border-radius: 14px; font-weight: 900; font-size: 14px; border: none; cursor: pointer; }
     .btn-confirm-del { background: var(--red); color: #fff; }
 
+    /* LOADER */
     #loading-overlay { position: fixed; inset: 0; background: #000; display: none; z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
     .loader { border: 4px solid #111; border-top: 4px solid var(--red); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 </style>
-
 <script>
     const API_KEY = 'AIzaSyCg2T_OVIV0C6Lmx-JCmV67nLiQDAwqbss';
     const CLIENT_ID = '474241917322-l7ub2cma675eat9g7ht2q8po09a15qhl.apps.googleusercontent.com';
@@ -362,14 +351,18 @@
     let myChartBilling = null, myChartStatus = null;
 
     window.onload = function() {
-        gapi.load('client', async () => {
-            await gapi.client.init({apiKey: API_KEY, discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']});
-            gapiInited = true; checkReady();
-        });
-        tokenClient = google.accounts.oauth2.initTokenClient({
-            client_id: CLIENT_ID, scope: 'https://www.googleapis.com/auth/drive.file', callback: ''
-        });
-        gisInited = true; checkReady();
+        try {
+            gapi.load('client', async () => {
+                try {
+                    await gapi.client.init({apiKey: API_KEY, discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']});
+                    gapiInited = true; checkReady();
+                } catch(e) { console.error("Error GAPI", e); }
+            });
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID, scope: 'https://www.googleapis.com/auth/drive.file', callback: ''
+            });
+            gisInited = true; checkReady();
+        } catch(err) { console.error("Error Google Load", err); }
     };
 
     function checkReady() { if(gapiInited && gisInited) { updateAuthUI(false); checkAuth(); } }
@@ -381,19 +374,18 @@
             updateAuthUI(true); 
             syncData(); 
             fetchUserInfo(); 
-        } 
-        else { render(); }
+        } else { 
+            render(); 
+        }
     }
 
     async function fetchUserInfo() {
         try {
             const res = await gapi.client.drive.about.get({ fields: 'user' });
             if (res.result && res.result.user) {
-                document.getElementById('user-name-display').innerText = 'HOLA, ' + res.result.user.displayName;
+                document.getElementById('user-name-display').innerText = 'HOLA, ' + res.result.user.displayName.toUpperCase();
             }
-        } catch (e) {
-            console.log("No se pudo obtener el nombre del usuario");
-        }
+        } catch (e) { console.log("No se pudo obtener el nombre del usuario"); }
     }
 
     function updateAuthUI(logged) { 
@@ -426,9 +418,8 @@
         document.getElementById('loading-overlay').style.display = 'flex';
         try {
             const res = await gapi.client.drive.files.list({ q: `name = '${DB_NAME}' and trashed = false` });
-            const files = res.result.files;
-            if(files.length > 0) {
-                driveFileId = files[0].id;
+            if(res.result.files && res.result.files.length > 0) {
+                driveFileId = res.result.files[0].id;
                 const content = await gapi.client.drive.files.get({ fileId: driveFileId, alt: 'media' });
                 records = Array.isArray(content.result) ? content.result : [];
             } else {
@@ -437,7 +428,7 @@
                 driveFileId = file.result.id; records = [];
             }
             render();
-        } catch(e) {}
+        } catch(e) { console.error(e); }
         document.getElementById('loading-overlay').style.display = 'none';
     }
 
@@ -451,49 +442,30 @@
         } catch(e) {}
     }
 
-    /* --- LÓGICA DE INTERFAZ Y MENÚS --- */
     function toggleMenu() { document.getElementById('main-menu').classList.toggle('active'); }
-    
-    window.onclick = function(event) {
-        if (!event.target.matches('#menu-btn') && !event.target.matches('#menu-btn i')) {
-            document.getElementById('main-menu').classList.remove('active');
-        }
-    }
-
+    window.onclick = function(e) { if (!e.target.matches('#menu-btn') && !e.target.matches('#menu-btn i')) document.getElementById('main-menu').classList.remove('active'); }
     function openFilters() { document.getElementById('modal-filtros').classList.add('active'); }
     function closeFilters() { document.getElementById('modal-filtros').classList.remove('active'); }
 
-    /* --- LÓGICA DE RANGO DE FECHAS --- */
     function applyDateRange() {
-        dateFrom = document.getElementById('filter-desde').value;
-        dateTo = document.getElementById('filter-hasta').value;
-        if(!dateFrom || !dateTo) return alert("Por favor, seleccioná ambas fechas.");
-        showAll = false; render(); closeFilters();
+        dateFrom = document.getElementById('filter-desde').value; dateTo = document.getElementById('filter-hasta').value;
+        if(!dateFrom || !dateTo) return alert("Seleccioná ambas fechas."); showAll = false; render(); closeFilters();
     }
-
     function clearDateRange() {
-        dateFrom = ''; dateTo = '';
-        document.getElementById('filter-desde').value = ''; document.getElementById('filter-hasta').value = '';
-        render();
+        dateFrom = ''; dateTo = ''; document.getElementById('filter-desde').value = ''; document.getElementById('filter-hasta').value = ''; render();
     }
 
-    /* --- LÓGICA DE DASHBOARD --- */
     function openDashboard() { document.getElementById('modal-dashboard').classList.add('active'); processAnalytics(); }
     function closeDashboard() { document.getElementById('modal-dashboard').classList.remove('active'); }
 
     function processAnalytics() {
         let dataDash = records;
-        if (dateFrom && dateTo) {
-            dataDash = dataDash.filter(r => r.fecha >= dateFrom && r.fecha <= dateTo);
-        } else if (!showAll) {
-            dataDash = dataDash.filter(r => r.fecha.startsWith(currentMonth));
-        }
+        if (dateFrom && dateTo) dataDash = dataDash.filter(r => (r.fecha||'') >= dateFrom && (r.fecha||'') <= dateTo);
+        else if (!showAll) dataDash = dataDash.filter(r => (r.fecha||'').startsWith(currentMonth));
 
         if (!dataDash.length) return;
-        
         const totalDinero = dataDash.reduce((s, r) => s + parseFloat(r.monto || 0), 0);
-        const promedio = totalDinero / dataDash.length;
-        document.getElementById('dash-promedio').innerText = '$' + promedio.toLocaleString('es-AR', {maximumFractionDigits:0});
+        document.getElementById('dash-promedio').innerText = '$' + (totalDinero / dataDash.length).toLocaleString('es-AR', {maximumFractionDigits:0});
 
         const vehiculos = {};
         dataDash.forEach(r => { if(r.vehiculo) vehiculos[r.vehiculo] = (vehiculos[r.vehiculo] || 0) + 1; });
@@ -501,52 +473,34 @@
         document.getElementById('dash-top-v').innerText = topV.toUpperCase();
 
         const meses = {};
-        records.forEach(r => {
-            const m = r.fecha.substring(0, 7);
-            meses[m] = (meses[m] || 0) + parseFloat(r.monto || 0);
-        });
+        records.forEach(r => { if(r.fecha) { const m = r.fecha.substring(0, 7); meses[m] = (meses[m] || 0) + parseFloat(r.monto || 0); } });
         const labelsMeses = Object.keys(meses).sort().slice(-6);
         const dataMeses = labelsMeses.map(m => meses[m]);
 
         if(myChartBilling) myChartBilling.destroy();
-        myChartBilling = new Chart(document.getElementById('chart-billing'), {
-            type: 'bar',
-            data: { labels: labelsMeses, datasets: [{ label: 'Facturación $', data: dataMeses, backgroundColor: '#3b82f6', borderRadius: 8 }] },
-            options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#262626' } } } }
-        });
+        myChartBilling = new Chart(document.getElementById('chart-billing'), { type: 'bar', data: { labels: labelsMeses, datasets: [{ label: 'Facturación $', data: dataMeses, backgroundColor: '#3b82f6', borderRadius: 8 }] }, options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#262626' } } } } });
 
         const cobrados = dataDash.filter(r => r.cobrado === 'SI').length;
-        const pendientes = dataDash.length - cobrados;
-
         if(myChartStatus) myChartStatus.destroy();
-        myChartStatus = new Chart(document.getElementById('chart-status'), {
-            type: 'doughnut',
-            data: { labels: ['Cobrado', 'Pendiente'], datasets: [{ data: [cobrados, pendientes], backgroundColor: ['#10b981', '#e11d48'], borderWidth: 0 }] },
-            options: { cutout: '70%', plugins: { legend: { position: 'bottom', labels: { color: '#71717a', font: { weight: 'bold' } } } } }
-        });
+        myChartStatus = new Chart(document.getElementById('chart-status'), { type: 'doughnut', data: { labels: ['Cobrado', 'Pendiente'], datasets: [{ data: [cobrados, dataDash.length - cobrados], backgroundColor: ['#10b981', '#e11d48'], borderWidth: 0 }] }, options: { cutout: '70%', plugins: { legend: { position: 'bottom', labels: { color: '#71717a', font: { weight: 'bold' } } } } } });
     }
 
-    /* --- LÓGICA DE RENDERIZADO Y FILTROS --- */
     function render() {
         const searchVal = document.getElementById('main-search').value.toLowerCase();
         let data = records;
 
         if (dateFrom && dateTo) {
-            data = data.filter(r => r.fecha >= dateFrom && r.fecha <= dateTo);
+            data = data.filter(r => (r.fecha||'') >= dateFrom && (r.fecha||'') <= dateTo);
             document.getElementById('current-month-display').innerText = `${dateFrom.split('-').reverse().join('/').substring(0,5)} al ${dateTo.split('-').reverse().join('/').substring(0,5)}`;
         } else if (!showAll) {
-            data = data.filter(r => r.fecha.startsWith(currentMonth));
+            data = data.filter(r => (r.fecha||'').startsWith(currentMonth));
             document.getElementById('current-month-display').innerText = currentMonth;
         } else {
             document.getElementById('current-month-display').innerText = "HISTORIAL COMPLETO";
         }
 
         if(searchVal) {
-            data = data.filter(r => 
-                (r.patente && r.patente.toLowerCase().includes(searchVal)) || 
-                (r.vehiculo && r.vehiculo.toLowerCase().includes(searchVal)) ||
-                (r.servicio && r.servicio.toString().includes(searchVal))
-            );
+            data = data.filter(r => (r.patente && r.patente.toLowerCase().includes(searchVal)) || (r.vehiculo && r.vehiculo.toLowerCase().includes(searchVal)) || (r.servicio && r.servicio.toString().includes(searchVal)));
         }
 
         const penMonto = data.filter(x => x.cobrado === 'NO').reduce((s,r) => s + parseFloat(r.monto || 0), 0);
@@ -557,11 +511,10 @@
         document.getElementById('c-Todos').innerText = data.length;
         document.getElementById('c-Pendiente').innerText = data.filter(x => x.estado === 'Pendiente').length;
         document.getElementById('c-Terminado').innerText = data.filter(x => x.estado === 'Terminado').length;
-
         if(currentFilter !== 'Todos') data = data.filter(r => r.estado === currentFilter);
 
         data.sort((a,b) => {
-            let res = sortBy === 'FECHA' ? a.fecha.localeCompare(b.fecha) : (sortBy === 'MONTO' ? parseFloat(a.monto) - parseFloat(b.monto) : parseInt(a.servicio) - parseInt(b.servicio));
+            let res = sortBy === 'FECHA' ? (a.fecha||'').localeCompare(b.fecha||'') : (sortBy === 'MONTO' ? parseFloat(a.monto||0) - parseFloat(b.monto||0) : parseInt(a.servicio||0) - parseInt(b.servicio||0));
             return sortAsc ? res : -res;
         });
 
@@ -570,80 +523,39 @@
 
         data.forEach(r => {
             const color = r.estado === 'Terminado' ? 'var(--green)' : (r.estado === 'En Curso' ? 'var(--blue)' : 'var(--red)');
-            const div = document.createElement('div');
-            div.className = 'card';
+            const div = document.createElement('div'); div.className = 'card';
             div.innerHTML = `<div class="card-accent" style="background:${color}"></div>
                 <div class="card-body" onclick="openForm('${r.id}')">
-                    <div class="card-top"><span class="card-id">#${r.servicio}</span><span class="card-price">$${parseFloat(r.monto).toLocaleString('es-AR')}</span></div>
-                    <div class="card-mid">
-                        <i class="fa-solid fa-car"></i> <b>${r.patente || 'S/P'}</b> | ${r.vehiculo || 'S/D'}<br>
-                        <i class="fa-solid fa-calendar"></i> ${r.fecha.split('-').reverse().join('/')} 
-                        <span class="card-km"> <i class="fa-solid fa-route"></i> ${r.km || 0} km</span>
-                    </div>
+                    <div class="card-top"><span class="card-id">#${r.servicio||'0'}</span><span class="card-price">$${parseFloat(r.monto||0).toLocaleString('es-AR')}</span></div>
+                    <div class="card-mid"><i class="fa-solid fa-car"></i> <b>${r.patente || 'S/P'}</b> | ${r.vehiculo || 'S/D'}<br><i class="fa-solid fa-calendar"></i> ${(r.fecha||'').split('-').reverse().join('/')} <span class="card-km"> <i class="fa-solid fa-route"></i> ${r.km || 0} km</span></div>
                 </div>`;
             container.appendChild(div);
         });
-        const total = data.reduce((s, r) => s + parseFloat(r.monto || 0), 0);
-        document.getElementById('total-monto').innerText = '$' + total.toLocaleString('es-AR', {minimumFractionDigits: 2});
+        document.getElementById('total-monto').innerText = '$' + data.reduce((s, r) => s + parseFloat(r.monto || 0), 0).toLocaleString('es-AR', {minimumFractionDigits: 2});
     }
 
     function toggleAllMonths() { showAll = !showAll; clearDateRange(); }
-    function changeMonth(d) {
-        clearDateRange();
-        let [y, m] = currentMonth.split('-').map(Number);
-        m += d; if(m>12){m=1;y++} else if(m<1){m=12;y--}
-        currentMonth = `${y}-${String(m).padStart(2,'0')}`; showAll = false; render();
-    }
-    function setFilter(f) { 
-        currentFilter = f; 
-        document.querySelectorAll('.chip-filter').forEach(c => c.classList.remove('active')); 
-        document.getElementById(`f-${f}`).classList.add('active'); 
-        render(); closeFilters();
-    }
+    function changeMonth(d) { clearDateRange(); let [y, m] = currentMonth.split('-').map(Number); m += d; if(m>12){m=1;y++} else if(m<1){m=12;y--} currentMonth = `${y}-${String(m).padStart(2,'0')}`; showAll = false; render(); }
+    function setFilter(f) { currentFilter = f; document.querySelectorAll('.chip-filter').forEach(c => c.classList.remove('active')); document.getElementById(`f-${f}`).classList.add('active'); render(); closeFilters(); }
     function setSort(s) {
         if (sortBy === s) sortAsc = !sortAsc; else { sortBy = s; sortAsc = false; }
-        document.querySelectorAll('.chip-sort').forEach(chip => {
-            chip.classList.remove('active');
-            let t = chip.innerText.replace(' ↑', '').replace(' ↓', '');
-            if (chip.id === `sort-${s}`) { chip.classList.add('active'); chip.innerText = t + (sortAsc ? ' ↑' : ' ↓'); } 
-            else { chip.innerText = t; }
-        });
+        document.querySelectorAll('.chip-sort').forEach(chip => { chip.classList.remove('active'); let t = chip.innerText.replace(' ↑', '').replace(' ↓', ''); if (chip.id === `sort-${s}`) { chip.classList.add('active'); chip.innerText = t + (sortAsc ? ' ↑' : ' ↓'); } else { chip.innerText = t; } });
         render(); closeFilters();
     }
 
-    /* --- LÓGICA DE FORMULARIO CRUD --- */
     function toggleBtn(btn) { btn.innerText = btn.innerText === 'SI' ? 'NO' : 'SI'; btn.className = 'toggle-btn ' + (btn.innerText === 'SI' ? 'si' : 'no'); }
     
     function openForm(id = null) {
         document.getElementById('btn-del').style.display = id ? 'block' : 'none';
-        
-        // Mostrar botón de PDF solo si el registro ya está guardado (tiene ID)
         document.getElementById('btn-pdf').style.display = id ? 'block' : 'none';
-
         if(id) {
             const r = records.find(x => x.id === id);
-            document.getElementById('f-id').value = r.id; 
-            document.getElementById('f-fecha').value = r.fecha; 
-            document.getElementById('f-servicio').value = r.servicio; 
-            document.getElementById('f-monto').value = r.monto; 
-            document.getElementById('f-patente').value = r.patente; 
-            document.getElementById('f-vehiculo').value = r.vehiculo || '';
-            document.getElementById('f-km').value = r.km || '';
-            document.getElementById('f-motivo').value = r.motivo; 
-            document.getElementById('f-estado').value = r.estado;
-            document.getElementById('f-conciliado').innerText = r.conciliado || 'NO';
-            document.getElementById('f-conciliado').className = 'toggle-btn ' + (r.conciliado === 'SI' ? 'si' : 'no');
-            document.getElementById('f-cobrado').innerText = r.cobrado || 'NO';
-            document.getElementById('f-cobrado').className = 'toggle-btn ' + (r.cobrado === 'SI' ? 'si' : 'no');
+            document.getElementById('f-id').value = r.id; document.getElementById('f-fecha').value = r.fecha; document.getElementById('f-servicio').value = r.servicio; document.getElementById('f-monto').value = r.monto; document.getElementById('f-patente').value = r.patente; document.getElementById('f-vehiculo').value = r.vehiculo || ''; document.getElementById('f-km').value = r.km || ''; document.getElementById('f-motivo').value = r.motivo; document.getElementById('f-estado').value = r.estado;
+            document.getElementById('f-conciliado').innerText = r.conciliado || 'NO'; document.getElementById('f-conciliado').className = 'toggle-btn ' + (r.conciliado === 'SI' ? 'si' : 'no');
+            document.getElementById('f-cobrado').innerText = r.cobrado || 'NO'; document.getElementById('f-cobrado').className = 'toggle-btn ' + (r.cobrado === 'SI' ? 'si' : 'no');
         } else {
-            document.getElementById('f-id').value = ''; 
-            document.getElementById('f-fecha').value = new Date().toISOString().substring(0,10); 
-            document.getElementById('f-servicio').value = ''; document.getElementById('f-monto').value = ''; 
-            document.getElementById('f-patente').value = ''; document.getElementById('f-vehiculo').value = '';
-            document.getElementById('f-km').value = ''; document.getElementById('f-motivo').value = ''; 
-            document.getElementById('f-estado').value = 'Pendiente';
-            document.getElementById('f-conciliado').innerText = 'NO'; document.getElementById('f-conciliado').className = 'toggle-btn no';
-            document.getElementById('f-cobrado').innerText = 'NO'; document.getElementById('f-cobrado').className = 'toggle-btn no';
+            document.getElementById('f-id').value = ''; document.getElementById('f-fecha').value = new Date().toISOString().substring(0,10); document.getElementById('f-servicio').value = ''; document.getElementById('f-monto').value = ''; document.getElementById('f-patente').value = ''; document.getElementById('f-vehiculo').value = ''; document.getElementById('f-km').value = ''; document.getElementById('f-motivo').value = ''; document.getElementById('f-estado').value = 'Pendiente';
+            document.getElementById('f-conciliado').innerText = 'NO'; document.getElementById('f-conciliado').className = 'toggle-btn no'; document.getElementById('f-cobrado').innerText = 'NO'; document.getElementById('f-cobrado').className = 'toggle-btn no';
         }
         document.getElementById('modal-form').classList.add('active');
     }
@@ -653,78 +565,47 @@
     
     async function saveRecord() {
         const id = document.getElementById('f-id').value;
-        const data = { 
-            id: id || Math.random().toString(36).substr(2, 9), 
-            fecha: document.getElementById('f-fecha').value, 
-            servicio: document.getElementById('f-servicio').value || '0', 
-            monto: document.getElementById('f-monto').value || 0, 
-            patente: document.getElementById('f-patente').value.toUpperCase(), 
-            vehiculo: document.getElementById('f-vehiculo').value,
-            km: document.getElementById('f-km').value || 0,
-            motivo: document.getElementById('f-motivo').value, 
-            estado: document.getElementById('f-estado').value,
-            conciliado: document.getElementById('f-conciliado').innerText,
-            cobrado: document.getElementById('f-cobrado').innerText
-        };
+        const data = { id: id || Math.random().toString(36).substr(2, 9), fecha: document.getElementById('f-fecha').value, servicio: document.getElementById('f-servicio').value || '0', monto: document.getElementById('f-monto').value || 0, patente: document.getElementById('f-patente').value.toUpperCase(), vehiculo: document.getElementById('f-vehiculo').value, km: document.getElementById('f-km').value || 0, motivo: document.getElementById('f-motivo').value, estado: document.getElementById('f-estado').value, conciliado: document.getElementById('f-conciliado').innerText, cobrado: document.getElementById('f-cobrado').innerText };
         if(id) records = records.map(r => r.id === id ? data : r); else records.push(data);
         closeForm(); render(); await saveToDrive();
     }
-    
-    async function confirmDelete() { 
-        closeConfirm();
-        records = records.filter(r => r.id !== document.getElementById('f-id').value); 
-        closeForm(); render(); await saveToDrive(); 
-    }
+    async function confirmDelete() { closeConfirm(); records = records.filter(r => r.id !== document.getElementById('f-id').value); closeForm(); render(); await saveToDrive(); }
 
-    /* --- LÓGICA PARA GENERAR COMPROBANTE PDF --- */
     function generatePDF() {
-        document.getElementById('loading-overlay').style.display = 'flex'; // Encendemos el cartel de carga
-
-        // Inyectamos los datos del formulario a la plantilla del PDF
+        if(typeof html2pdf === 'undefined') return alert("La librería PDF aún no cargó. Intentá en un segundo.");
+        document.getElementById('loading-overlay').style.display = 'flex';
         document.getElementById('pdf-nro').innerText = document.getElementById('f-servicio').value || 'S/N';
         document.getElementById('pdf-fecha').innerText = document.getElementById('f-fecha').value.split('-').reverse().join('/');
         document.getElementById('pdf-vehiculo').innerText = document.getElementById('f-vehiculo').value || 'Sin especificar';
         document.getElementById('pdf-patente').innerText = document.getElementById('f-patente').value || 'S/P';
         document.getElementById('pdf-km').innerText = document.getElementById('f-km').value + ' km';
         document.getElementById('pdf-motivo').innerText = document.getElementById('f-motivo').value || 'Asistencia mecánica';
-        
-        const montoStr = parseFloat(document.getElementById('f-monto').value || 0).toLocaleString('es-AR', {minimumFractionDigits: 2});
-        document.getElementById('pdf-monto').innerText = '$' + montoStr;
+        document.getElementById('pdf-monto').innerText = '$' + parseFloat(document.getElementById('f-monto').value || 0).toLocaleString('es-AR', {minimumFractionDigits: 2});
+        const est = document.getElementById('f-cobrado').innerText;
+        document.getElementById('pdf-estado').innerText = est === 'SI' ? 'PAGADO' : 'PENDIENTE DE PAGO';
+        document.getElementById('pdf-estado').style.color = est === 'SI' ? '#10b981' : '#e11d48';
 
-        const estadoCobro = document.getElementById('f-cobrado').innerText;
-        const elmEstado = document.getElementById('pdf-estado');
-        elmEstado.innerText = estadoCobro === 'SI' ? 'PAGADO' : 'PENDIENTE DE PAGO';
-        elmEstado.style.color = estadoCobro === 'SI' ? '#10b981' : '#e11d48';
-
-        // Opciones de configuración del PDF
-        const opt = {
-            margin:       0.5,
-            filename:     `RedSOS_Servicio_${document.getElementById('pdf-nro').innerText}.pdf`,
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2 },
-            jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
-        };
-
-        // Generamos el PDF desde la plantilla oculta
-        const element = document.getElementById('pdf-template');
-        html2pdf().set(opt).from(element).save().then(() => {
-            document.getElementById('loading-overlay').style.display = 'none'; // Apagamos el cartel de carga
-        });
+        html2pdf().set({ margin: 0.5, filename: `RedSOS_Comprobante_${document.getElementById('pdf-nro').innerText}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(document.getElementById('pdf-template')).save().then(() => { document.getElementById('loading-overlay').style.display = 'none'; });
     }
 
-    /* --- LÓGICA DE IMPORTACIÓN Y EXPORTACIÓN --- */
     function exportToCSV() {
-        if (!records.length) return alert("No hay datos para exportar.");
-        let csv = "ID,FECHA,SERVICIO,MONTO,PATENTE,VEHICULO,KM,MOTIVO,ESTADO,CONCILIADO,COBRADO\n";
-        records.forEach(r => {
-            let motivoLimpio = `"${(r.motivo || '').replace(/"/g, '""')}"`;
-            let row = [ r.id, r.fecha, r.servicio, r.monto, r.patente, r.vehiculo, r.km, motivoLimpio, r.estado, r.conciliado, r.cobrado ];
-            csv += row.join(",") + "\n";
-        });
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `RedSOS_Reporte_${new Date().toISOString().substring(0,10)}.csv`; link.click();
+        if (!records.length) return alert("No hay datos."); let csv = "ID,FECHA,SERVICIO,MONTO,PATENTE,VEHICULO,KM,MOTIVO,ESTADO,CONCILIADO,COBRADO\n";
+        records.forEach(r => { csv += `${r.id},${r.fecha||''},${r.servicio||''},${r.monto||''},${r.patente||''},${r.vehiculo||''},${r.km||''},"${(r.motivo||'').replace(/"/g, '""')}",${r.estado||''},${r.conciliado||''},${r.cobrado||''}\n`; });
+        const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = `RedSOS_Reporte.csv`; a.click();
     }
-
     function exportBackup() {
-        if (!records.length) return alert("No hay datos para respaldar.");
-        const blob = new Blob([JSON.stringify(records)], { typ
+        if (!records.length) return alert("No hay datos.");
+        const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(records)], { type: 'application/json' })); a.download = `RedSOS_Backup.json`; a.click();
+    }
+    function importBackup(event) {
+        const f = event.target.files[0]; if (!f) return;
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            try { const imp = JSON.parse(e.target.result); if (Array.isArray(imp)) { if (confirm("Sumar a base actual? Cancelar reemplaza todo.")) { const ids = new Set(records.map(r => r.id)); imp.forEach(n => { if (!ids.has(n.id)) records.push(n); }); } else { records = imp; } document.getElementById('loading-overlay').style.display = 'flex'; await saveToDrive(); render(); } } catch (e) { alert("Archivo inválido."); }
+            document.getElementById('loading-overlay').style.display = 'none'; event.target.value = '';
+        }; reader.readAsText(f);
+    }
+</script>
+</body>
+</html>
+

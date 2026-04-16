@@ -2,619 +2,554 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RedSOS Gestión</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>SOS App Pro - Red SOS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script async defer src="https://accounts.google.com/gsi/client"></script>
-    <script async defer src="https://apis.google.com/js/api.js"></script>
-
-    <style>
-        :root {
-            --bg-dark: #18181b;
-            --panel-dark: #27272a;
-            --text-main: #f4f4f5;
-            --green: #10b981;
-            --red: #ef4444;
-            --amber: #f59e0b;
-            --blue: #3b82f6;
-        }
-
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--bg-dark); color: var(--text-main); margin: 0; padding: 0; padding-bottom: 80px; }
-
-        header { padding: 15px; background: var(--panel-dark); position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        button { border: none; border-radius: 6px; padding: 10px 15px; font-weight: bold; cursor: pointer; color: white; background: var(--blue); transition: 0.2s; }
-        button:active { transform: scale(0.95); }
-
-        #menu-btn { background: transparent; font-size: 1.5rem; padding: 5px; }
-        #auth-btn { background: var(--panel-dark); border: 1px solid var(--text-main); }
-        #auth-btn.logged-in { background: var(--green); border: none; }
-
-        .search-bar { position: relative; width: 100%; }
-        .search-bar i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #a1a1aa; }
-        .search-bar input { width: 100%; padding: 12px 15px 12px 40px; border-radius: 20px; border: none; background: #3f3f46; color: white; font-size: 1rem; outline: none; }
-
-        .menu { position: fixed; top: 0; left: -250px; width: 250px; height: 100%; background: var(--panel-dark); z-index: 1000; transition: 0.3s; padding-top: 60px; box-shadow: 2px 0 5px rgba(0,0,0,0.5); }
-        .menu.active { left: 0; }
-        .menu button { display: block; width: 100%; text-align: left; background: transparent; border-radius: 0; padding: 15px 20px; font-size: 1rem; border-bottom: 1px solid #3f3f46; }
-
-        main { padding: 15px; }
-        .stats-container { display: flex; gap: 10px; margin-bottom: 15px; }
-        .stat-box { flex: 1; background: var(--panel-dark); padding: 10px; border-radius: 8px; text-align: center; display: flex; flex-direction: column; }
-        .stat-box span { font-size: 0.75rem; color: #a1a1aa; text-transform: uppercase; }
-        .stat-box strong { font-size: 1.2rem; margin-top: 5px; }
-
-        .controls-row { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; }
-        .controls-row button { background: #3f3f46; padding: 8px 12px; }
-
-        .card { background: var(--panel-dark); border-radius: 8px; margin-bottom: 12px; display: flex; overflow: hidden; position: relative; cursor: pointer; }
-        .card-accent { width: 8px; flex-shrink: 0; }
-        .card-body { padding: 15px; flex: 1; display: flex; flex-direction: column; }
-        .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .card-id { font-weight: 900; color: #a1a1aa; }
-        .card-price { font-weight: 900; font-size: 1.2rem; color: white; }
-        .card-mid { font-size: 0.9rem; color: #d4d4d8; line-height: 1.6; }
-        .card-km { float: right; color: #a1a1aa; font-size: 0.8rem; }
-
-        .fab { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--blue); font-size: 1.5rem; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 90; display: flex; justify-content: center; align-items: center; }
-
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; }
-        .modal.active { display: flex; }
-        .modal-content { background: var(--bg-dark); padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; border: 1px solid #3f3f46; }
-        .modal-content h3 { margin-top: 0; border-bottom: 1px solid #3f3f46; padding-bottom: 10px; }
-
-        .modal-content input:not([type="hidden"]), .modal-content select { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #3f3f46; background: var(--panel-dark); color: white; outline: none; }
-        .modal-content label { display: block; margin-bottom: 5px; font-size: 0.85rem; color: #a1a1aa; }
-
-        .filter-group { margin-bottom: 20px; }
-        .chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
-        .chip-filter, .chip-sort { background: #3f3f46; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; }
-        .chip-filter.active, .chip-sort.active { background: var(--blue); color: white; font-weight: bold; }
-
-        .toggle-btn { width: 60px; text-align: center; padding: 8px; font-weight: bold; }
-        .toggle-btn.si { background: var(--green); }
-        .toggle-btn.no { background: var(--red); }
-    </style>
 </head>
 <body>
-    <div id="loading-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; justify-content:center; align-items:center; color:white; font-size:1.5rem; flex-direction:column;">
-        <i class="fa-solid fa-spinner fa-spin" style="font-size:3rem; margin-bottom:15px;"></i>
-        <span>Sincronizando...</span>
-    </div>
 
+<div id="loading-overlay">
+    <div class="loader"></div>
+    <p>SINCRO DRIVE...</p>
+</div>
+
+<div id="app-container">
     <header>
-        <div class="header-top">
-            <button id="menu-btn" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
-            <div id="user-name-display" style="font-size:0.8rem; color:#a1a1aa; font-weight:bold;"></div>
-            <button id="auth-btn" onclick="handleAuthClick()"><span id="auth-text">INICIAR SESIÓN</span></button>
+        <div class="logo">RED<span>SOS</span></div>
+        <div class="header-actions">
+            <div id="user-name-display"></div>
+            <div class="header-actions-row">
+                <button id="auth-btn" onclick="handleAuthClick()">
+                    <i class="fa-brands fa-google"></i> <span id="auth-text">...</span>
+                </button>
+                <button id="menu-btn" onclick="toggleMenu()">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+            </div>
         </div>
-        <div class="search-bar">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="main-search" placeholder="Buscar por patente, vehículo o N°..." onkeyup="render()">
+
+        <div class="dropdown-menu" id="main-menu">
+            <button onclick="openDashboard(); toggleMenu()"><i class="fa-solid fa-chart-pie"></i> Reportes Analíticos</button>
+            <button onclick="exportToCSV(); toggleMenu()"><i class="fa-solid fa-file-csv"></i> Exportar a Excel</button>
+            <button onclick="exportBackup(); toggleMenu()"><i class="fa-solid fa-download"></i> Descargar Backup</button>
+            <button onclick="document.getElementById('file-import').click(); toggleMenu()"><i class="fa-solid fa-upload"></i> Importar Datos</button>
         </div>
+        <input type="file" id="file-import" style="display:none" accept=".json" onchange="importBackup(event)">
     </header>
 
-    <div id="main-menu" class="menu">
-        <button onclick="openDashboard()"><i class="fa-solid fa-chart-pie"></i> Estadísticas</button>
-        <button onclick="exportToCSV()"><i class="fa-solid fa-file-csv"></i> Exportar a CSV (Excel)</button>
-        <button onclick="exportBackup()"><i class="fa-solid fa-download"></i> Descargar Backup JSON</button>
-        <button onclick="document.getElementById('import-file').click()"><i class="fa-solid fa-upload"></i> Cargar Backup JSON</button>
-        <input type="file" id="import-file" style="display:none;" accept=".json" onchange="importBackup(event)">
+    <div id="offline-banner">
+        <i class="fa-solid fa-wifi-slash"></i> MODO SIN CONEXIÓN: Los datos se sincronizarán al volver
     </div>
 
-    <main>
-        <div class="stats-container">
-            <div class="stat-box"><span>Mes/Período</span><strong id="current-month-display"></strong></div>
-            <div class="stat-box" style="color:var(--red);"><span>Pendiente</span><strong id="stat-pendiente">$0</strong></div>
-            <div class="stat-box" style="color:var(--green);"><span>Cobrado</span><strong id="stat-cobrado">$0</strong></div>
+    <div class="search-container">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="main-search" placeholder="Buscar patente, vehículo o N°..." oninput="render()">
         </div>
+    </div>
 
-        <div class="controls-row">
+    <div class="stats-row">
+        <div class="stat-card">
+            <span class="stat-label">PENDIENTE</span>
+            <span class="stat-value red" id="stat-pendiente">$0</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">COBRADO</span>
+            <span class="stat-value green" id="stat-cobrado">$0</span>
+        </div>
+    </div>
+
+    <div class="controls-row">
+        <div class="month-nav">
             <button onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-            <button onclick="toggleAllMonths()"><i class="fa-solid fa-calendar-days"></i> Todo</button>
+            <span id="current-month-display" onclick="toggleAllMonths()">---</span>
             <button onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
-            <button onclick="openFilters()" style="margin-left:auto;"><i class="fa-solid fa-filter"></i> Filtros</button>
         </div>
+        <button class="btn-filter" onclick="openFilters()">
+            <i class="fa-solid fa-sliders"></i> Filtros
+        </button>
+    </div>
 
-        <div id="list-container"></div>
-        
-        <div style="text-align:right; padding:15px; font-size:1.2rem; font-weight:bold;">
-            TOTAL: <span id="total-monto">$0.00</span>
+    <main id="list-container"></main>
+
+    <footer>
+        <div class="total-box">
+            <span id="total-label">FACTURACIÓN PERÍODO</span>
+            <div class="total-amount" id="total-monto">$0,00</div>
         </div>
-    </main>
+        <button class="fab" onclick="openForm()">
+            <i class="fa-solid fa-plus"></i>
+        </button>
+    </footer>
 
-    <button class="fab" onclick="openForm()"><i class="fa-solid fa-plus"></i></button>
-
-    <div id="modal-filtros" class="modal">
-        <div class="modal-content">
-            <h3>Filtros y Orden</h3>
-            <div class="filter-group">
-                <label>Rango de Fechas:</label>
-                <input type="date" id="filter-desde"> a <input type="date" id="filter-hasta">
-                <button onclick="applyDateRange()" style="margin-top:10px; width:100%;">Aplicar Rango</button>
-                <button onclick="clearDateRange()" style="margin-top:5px; width:100%; background:#3f3f46;">Limpiar Rango</button>
+    <div class="modal-overlay" id="modal-filtros">
+        <div class="bottom-sheet" style="height: auto; min-height: 40%;">
+            <div class="sheet-header">
+                <button class="btn-close" onclick="closeFilters()"><i class="fa-solid fa-xmark"></i></button>
+                <div class="sheet-title">ORDENAR Y FILTRAR</div>
             </div>
-            <div class="filter-group">
-                <label>Estado:</label>
-                <div class="chip-container">
-                    <span class="chip-filter active" id="f-Todos" onclick="setFilter('Todos')">Todos (<span id="c-Todos">0</span>)</span>
-                    <span class="chip-filter" id="f-Pendiente" onclick="setFilter('Pendiente')">Pendientes (<span id="c-Pendiente">0</span>)</span>
-                    <span class="chip-filter" id="f-Terminado" onclick="setFilter('Terminado')">Terminados (<span id="c-Terminado">0</span>)</span>
+            <div class="sheet-body">
+                <label class="filter-label">RANGO DE FECHAS:</label>
+                <div class="row-inputs" style="margin-bottom: 5px;">
+                    <div class="input-group"><label>DESDE</label><input type="date" id="filter-desde"></div>
+                    <div class="input-group"><label>HASTA</label><input type="date" id="filter-hasta"></div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-bottom: 25px;">
+                    <button class="btn-cancel" style="flex:1; padding:12px; border-radius:12px; font-size:12px" onclick="clearDateRange()">LIMPIAR</button>
+                    <button class="btn-save" style="flex:1; margin-top:0; padding:12px; border-radius:12px; font-size:12px" onclick="applyDateRange()">APLICAR</button>
+                </div>
+                <label class="filter-label">ORDENAR POR:</label>
+                <div class="scroll-bar" style="margin-bottom: 25px;">
+                    <div class="chip chip-sort active" id="sort-FECHA" onclick="setSort('FECHA')">FECHA ↓</div>
+                    <div class="chip chip-sort" id="sort-MONTO" onclick="setSort('MONTO')">MONTO</div>
+                    <div class="chip chip-sort" id="sort-SERVICIO" onclick="setSort('SERVICIO')">N°</div>
+                </div>
+                <label class="filter-label">VER ESTADO:</label>
+                <div class="scroll-bar">
+                    <div class="chip chip-filter active" id="f-Todos" onclick="setFilter('Todos')">Todos <span class="badge" id="c-Todos">0</span></div>
+                    <div class="chip chip-filter" id="f-Pendiente" onclick="setFilter('Pendiente')">Pend. <span class="badge" id="c-Pendiente">0</span></div>
+                    <div class="chip chip-filter" id="f-Terminado" onclick="setFilter('Terminado')">Term. <span class="badge" id="c-Terminado">0</span></div>
                 </div>
             </div>
-            <div class="filter-group">
-                <label>Ordenar por:</label>
-                <div class="chip-container">
-                    <span class="chip-sort active" id="sort-FECHA" onclick="setSort('FECHA')">FECHA ↓</span>
-                    <span class="chip-sort" id="sort-MONTO" onclick="setSort('MONTO')">MONTO</span>
-                    <span class="chip-sort" id="sort-SERVICIO" onclick="setSort('SERVICIO')">SERVICIO</span>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-dashboard">
+        <div class="bottom-sheet full-height">
+            <div class="sheet-header">
+                <button class="btn-close" onclick="closeDashboard()"><i class="fa-solid fa-xmark"></i></button>
+                <div class="sheet-title">ANÁLISIS DE NEGOCIO</div>
+            </div>
+            <div class="sheet-body">
+                <div class="analytics-grid">
+                    <div class="metric-mini"><span class="m-label">TICKET PROMEDIO</span><span class="m-value" id="dash-promedio">$0</span></div>
+                    <div class="metric-mini"><span class="m-label">TOP VEHÍCULO</span><span class="m-value" id="dash-top-v">-</span></div>
                 </div>
-            </div>
-            <button onclick="closeFilters()" style="width:100%; margin-top:15px; background:var(--red);">Cerrar</button>
-        </div>
-    </div>
-
-    <div id="modal-form" class="modal">
-        <div class="modal-content" style="max-height:90vh; overflow-y:auto;">
-            <h3>Datos del Servicio</h3>
-            <input type="hidden" id="f-id">
-            
-            <label>Fecha</label><input type="date" id="f-fecha">
-            <label>N° Servicio</label><input type="number" id="f-servicio">
-            <label>Monto ($)</label><input type="number" step="0.01" id="f-monto" placeholder="Ej: 15000.50">
-            <label>Patente</label><input type="text" id="f-patente" style="text-transform:uppercase;">
-            <label>Vehículo</label><input type="text" id="f-vehiculo">
-            <label>Kilómetros</label><input type="number" id="f-km">
-            <label>Motivo</label><input type="text" id="f-motivo">
-            <label>Estado</label>
-            <select id="f-estado">
-                <option value="Pendiente">Pendiente</option>
-                <option value="En Curso">En Curso</option>
-                <option value="Terminado">Terminado</option>
-            </select>
-            
-            <div style="display:flex; justify-content:space-between; margin-top:15px;">
-                <label>Conciliado</label>
-                <button id="f-conciliado" class="toggle-btn no" onclick="toggleBtn(this)">NO</button>
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-top:15px;">
-                <label>Cobrado</label>
-                <button id="f-cobrado" class="toggle-btn no" onclick="toggleBtn(this)">NO</button>
-            </div>
-
-            <div style="display:flex; gap:10px; margin-top:25px;">
-                <button onclick="saveRecord()" style="flex:1; background:var(--green);"><i class="fa-solid fa-save"></i> Guardar</button>
-                <button onclick="closeForm()" style="flex:1; background:#3f3f46;">Cancelar</button>
-            </div>
-            <button id="btn-pdf" onclick="generatePDF()" style="width:100%; margin-top:10px; background:#0ea5e9;"><i class="fa-solid fa-file-pdf"></i> Generar Comprobante PDF</button>
-            <button id="btn-del" onclick="openConfirm()" style="width:100%; margin-top:10px; background:var(--red);"><i class="fa-solid fa-trash"></i> Eliminar Registro</button>
-        </div>
-    </div>
-
-    <div id="modal-confirm" class="modal">
-        <div class="modal-content" style="text-align:center;">
-            <h3>¿Eliminar registro?</h3>
-            <p>Esta acción no se puede deshacer.</p>
-            <div style="display:flex; gap:10px; margin-top:20px;">
-                <button onclick="confirmDelete()" style="flex:1; background:var(--red);">Sí, eliminar</button>
-                <button onclick="closeConfirm()" style="flex:1; background:#3f3f46;">Cancelar</button>
+                <div class="chart-box"><h3>FACTURACIÓN MENSUAL</h3><canvas id="chart-billing"></canvas></div>
+                <div class="chart-box"><h3>ESTADO DE COBROS</h3><canvas id="chart-status"></canvas></div>
             </div>
         </div>
     </div>
 
-    <div id="modal-dashboard" class="modal">
-        <div class="modal-content" style="max-height:90vh; overflow-y:auto;">
-            <h3>Dashboard (Período actual)</h3>
-            <div class="stats-container" style="margin-bottom:15px;">
-                <div class="stat-box"><span>Ticket Promedio</span><strong id="dash-promedio">$0</strong></div>
-                <div class="stat-box"><span>Vehículo Frecuente</span><strong id="dash-top-v">N/A</strong></div>
+    <div class="modal-overlay" id="modal-form">
+        <div class="bottom-sheet">
+            <div class="sheet-header">
+                <button class="btn-close" onclick="closeForm()"><i class="fa-solid fa-xmark"></i></button>
+                <div class="sheet-title">PARTE DE SERVICIO</div>
             </div>
-            <h4>Facturación Últimos Meses</h4>
-            <canvas id="chart-billing" style="margin-bottom:20px;"></canvas>
-            <h4>Estado de Cobros</h4>
-            <div style="width:200px; margin:0 auto;"><canvas id="chart-status"></canvas></div>
-            <button onclick="closeDashboard()" style="width:100%; margin-top:20px; background:#3f3f46;">Cerrar</button>
+            <div class="sheet-body">
+                <input type="hidden" id="f-id">
+                <div class="input-group"><label>FECHA</label><input type="date" id="f-fecha"></div>
+                <div class="row-inputs">
+                    <div class="input-group"><label>SERVICIO #</label><input type="number" id="f-servicio"></div>
+                    <div class="input-group"><label>MONTO ($)</label><input type="number" step="0.01" id="f-monto"></div>
+                </div>
+                <div class="row-inputs">
+                    <div class="input-group"><label>PATENTE</label><input type="text" id="f-patente"></div>
+                    <div class="input-group"><label>KM</label><input type="number" id="f-km" placeholder="0"></div>
+                </div>
+                <div class="input-group"><label>VEHÍCULO (MARCA/MODELO)</label><input type="text" id="f-vehiculo"></div>
+                <div class="input-group"><label>MOTIVO / DETALLE</label><input type="text" id="f-motivo"></div>
+                <div class="input-group">
+                    <label>ESTADO</label>
+                    <select id="f-estado">
+                        <option value="Pendiente">PENDIENTE</option>
+                        <option value="En Curso">EN CURSO</option>
+                        <option value="Terminado">TERMINADO</option>
+                    </select>
+                </div>
+                <div class="toggle-row"><span>Conciliado</span><button type="button" id="f-conciliado" class="toggle-btn no" onclick="toggleBtn(this)">NO</button></div>
+                <div class="toggle-row"><span>Cobrado</span><button type="button" id="f-cobrado" class="toggle-btn no" onclick="toggleBtn(this)">NO</button></div>
+                
+                <button class="btn-save" onclick="saveRecord()">✓ GUARDAR CAMBIOS</button>
+                <button type="button" id="btn-pdf" class="btn-save" style="background: var(--amber); color: #000; display: none; margin-top: 10px;" onclick="generatePDF()"><i class="fa-solid fa-file-pdf"></i> GENERAR PDF</button>
+                <button id="btn-del" class="btn-del-danger" onclick="openConfirm()">ELIMINAR REGISTRO</button>
+            </div>
         </div>
     </div>
 
-    <div id="pdf-template" style="display:none; padding:40px; font-family:sans-serif; color:#18181b; background:white;">
-        <div style="display:flex; justify-content:space-between; border-bottom:2px solid #e4e4e7; padding-bottom:10px; margin-bottom:20px;">
-            <div><h1 style="margin:0; color:#27272a;">RedSOS</h1><p style="margin:0; color:#71717a;">Servicios Mecánicos</p></div>
-            <div style="text-align:right;"><h2 style="margin:0; color:#3f3f46;">COMPROBANTE</h2><p style="margin:0; font-weight:bold;">N° <span id="pdf-nro"></span></p></div>
-        </div>
-        <div style="display:flex; justify-content:space-between; margin-bottom:30px;">
-            <div><strong>Fecha:</strong> <span id="pdf-fecha"></span><br><strong>Vehículo:</strong> <span id="pdf-vehiculo"></span></div>
-            <div style="text-align:right;"><strong>Patente:</strong> <span id="pdf-patente"></span><br><strong>Kilometraje:</strong> <span id="pdf-km"></span></div>
-        </div>
-        <div style="background:#f4f4f5; padding:15px; border-radius:8px; margin-bottom:30px;">
-            <p style="margin:0;"><strong>Motivo de Asistencia:</strong></p>
-            <p style="margin:5px 0 0 0;" id="pdf-motivo"></p>
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid #e4e4e7; padding-top:20px;">
-            <div><p style="margin:0; font-weight:bold; font-size:1.2rem;">ESTADO: <span id="pdf-estado"></span></p></div>
-            <div style="text-align:right;"><p style="margin:0; font-size:1.5rem; font-weight:bold;">TOTAL: <span id="pdf-monto"></span></p></div>
+    <div class="modal-overlay" id="modal-confirm">
+        <div class="confirm-box">
+            <h3>¿ELIMINAR?</h3>
+            <div class="confirm-actions">
+                <button class="btn-cancel" onclick="closeConfirm()">NO</button>
+                <button class="btn-confirm-del" onclick="confirmDelete()">SÍ</button>
+            </div>
         </div>
     </div>
-    <script>
-        const API_KEY = 'AIzaSyCg2T_OVIV0C6Lmx-JCmV67nLiQDAwqbss';
-        const CLIENT_ID = '474241917322-l7ub2cma675eat9g7ht2q8po09a15qhl.apps.googleusercontent.com';
-        const DB_NAME = 'sos_database_vFINAL_CORREGIDA.json';
+</div>
 
-        let tokenClient, gapiInited = false, gisInited = false, driveFileId = null;
-        let records = [], currentFilter = 'Todos', sortBy = 'FECHA', sortAsc = false, showAll = false;
-        let currentMonth = new Date().toISOString().substring(0, 7);
-        let dateFrom = '', dateTo = '';
-        let myChartBilling = null, myChartStatus = null;
+<div id="pdf-wrapper" style="position: absolute; left: -9999px; top: 0;">
+    <div id="pdf-template" style="width: 700px; padding: 40px; box-sizing: border-box; background: white; color: black; font-family: 'Roboto', sans-serif;">
+        <div style="border-bottom: 3px solid #ef4444; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end;">
+            <div>
+                <h1 style="color: #ef4444; margin: 0; font-size: 38px; font-style: italic; font-weight: 900; letter-spacing: -1px;">RED<span style="color: #000;">SOS</span></h1>
+                <p style="margin: 5px 0 0 0; font-size: 13px; color: #555; font-weight: bold;">Servicio de Auxilio Mecánico y Remolques</p>
+            </div>
+            <div style="text-align: right;">
+                <h2 style="margin: 0; color: #111; font-size: 24px; font-weight: 900;">COMPROBANTE</h2>
+                <p style="margin: 5px 0 0 0; font-size: 16px; color: #555;">Servicio N° <span id="pdf-nro" style="font-weight: bold; color: #000;"></span></p>
+            </div>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
+            <div style="background: #f4f4f5; padding: 15px 20px; border-radius: 10px; width: 48%; box-sizing: border-box;">
+                <p style="margin: 0 0 5px 0; font-size: 12px; color: #71717a; font-weight: bold;">FECHA DEL SERVICIO</p>
+                <p style="margin: 0; font-size: 18px; font-weight: 900;" id="pdf-fecha"></p>
+            </div>
+            <div style="background: #f4f4f5; padding: 15px 20px; border-radius: 10px; width: 48%; text-align: right; box-sizing: border-box;">
+                <p style="margin: 0 0 5px 0; font-size: 12px; color: #71717a; font-weight: bold;">ESTADO</p>
+                <p style="margin: 0; font-size: 18px; font-weight: 900;" id="pdf-estado"></p>
+            </div>
+        </div>
+        <h3 style="color: #ef4444; border-bottom: 1px solid #e4e4e7; padding-bottom: 10px; font-size: 15px;">DATOS DEL VEHÍCULO Y SERVICIO</h3>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px; font-size: 14px;">
+            <tr><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a; font-weight: bold; width: 30%;">Vehículo:</td><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; font-weight: 900;" id="pdf-vehiculo"></td></tr>
+            <tr><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a; font-weight: bold;">Dominio (Patente):</td><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; font-weight: 900;" id="pdf-patente"></td></tr>
+            <tr><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a; font-weight: bold;">Kilómetros:</td><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; font-weight: 900;" id="pdf-km"></td></tr>
+            <tr><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a; font-weight: bold; vertical-align: top;">Motivo / Detalle:</td><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; font-weight: 900;" id="pdf-motivo"></td></tr>
+        </table>
+        <div style="display: flex; justify-content: flex-end;">
+            <div style="background: #111; color: white; padding: 20px 30px; border-radius: 12px; width: 300px; text-align: right; box-sizing: border-box;">
+                <p style="margin: 0 0 5px 0; font-size: 13px; color: #a1a1aa;">TOTAL A ABONAR</p>
+                <p style="margin: 0; font-size: 28px; font-weight: 900; letter-spacing: -1px;" id="pdf-monto"></p>
+            </div>
+        </div>
+    </div>
+</div>
 
-        // --- LÓGICA MODO OFFLINE ---
-        let isOffline = !navigator.onLine;
+<style>
+    :root { 
+        --bg: #09090b; --card: #18181b; --input: #27272a; --border: #3f3f46; 
+        --red: #ef4444; --amber: #f59e0b; --green: #10b981; --gray: #a1a1aa; 
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background: var(--bg); color: #fff; height: 100dvh; overflow: hidden; display: flex; justify-content: center; }
+    #app-container { width: 100%; max-width: 500px; height: 100%; display: flex; flex-direction: column; position: relative; }
 
-        window.addEventListener('offline', () => { 
-            isOffline = true; 
-            showOfflineBanner(true); 
+    header { padding: 30px 20px 10px; display: flex; justify-content: space-between; align-items: center; position: relative; }
+    .logo { color: #fff; font-size: 28px; font-weight: 900; letter-spacing: -1px; }
+    .logo span { color: var(--red); }
+    
+    .header-actions { display: flex; flex-direction: column; align-items: flex-end; }
+    #user-name-display { font-size: 9px; color: var(--amber); font-weight: 900; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .header-actions-row { display: flex; gap: 8px; align-items: center; }
+    
+    #auth-btn { background: var(--input); border: 1px solid var(--border); color: #fff; padding: 8px 12px; border-radius: 12px; font-size: 11px; font-weight: 900; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+    #auth-btn.logged-in { border-color: var(--green); color: var(--green); }
+    #menu-btn { background: transparent; border: none; color: #fff; font-size: 20px; padding: 5px; cursor: pointer; }
+    
+    /* MODAL OFFLINE */
+    #offline-banner { background: var(--amber); color: #000; text-align: center; padding: 8px; font-size: 11px; font-weight: 900; display: none; align-items: center; justify-content: center; gap: 8px; letter-spacing: 0.5px; z-index: 50; }
+    #offline-banner.active { display: flex; }
+
+    .dropdown-menu { position: absolute; top: 85px; right: 20px; background: var(--card); border: 1px solid var(--border); border-radius: 15px; padding: 10px; display: none; flex-direction: column; gap: 5px; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.9); }
+    .dropdown-menu.active { display: flex; }
+    .dropdown-menu button { background: transparent; border: none; color: #fff; padding: 12px 15px; text-align: left; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 12px; border-radius: 8px; cursor: pointer; }
+    .dropdown-menu button:hover { background: var(--input); }
+
+    .search-container { padding: 10px 20px; }
+    .search-box { background: var(--input); border: 1px solid var(--border); border-radius: 15px; padding: 12px 15px; display: flex; align-items: center; gap: 10px; }
+    .search-box input { background: transparent; border: none; color: #fff; outline: none; width: 100%; font-size: 14px; }
+
+    .stats-row { display: flex; gap: 10px; padding: 5px 20px 10px; }
+    .stat-card { flex: 1; background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 16px; text-align: center; }
+    .stat-label { display: block; color: var(--gray); font-size: 9px; font-weight: 900; margin-bottom: 5px; }
+    .stat-value { font-size: 18px; font-weight: 900; }
+    .stat-value.red { color: var(--red); }
+    .stat-value.green { color: var(--green); }
+
+    .controls-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 20px 10px; gap: 10px; }
+    .month-nav { flex: 1; background: var(--input); border: 1px solid var(--border); border-radius: 14px; display: flex; justify-content: space-between; align-items: center; padding: 5px; }
+    .month-nav button { background: transparent; border: none; color: var(--gray); padding: 10px; font-size: 16px; cursor: pointer; }
+    #current-month-display { font-size: 13px; font-weight: 900; color: #fff; text-align: center; flex: 1; cursor: pointer; }
+    .btn-filter { background: #fff; border: none; color: #000; padding: 0 18px; height: 42px; border-radius: 14px; font-weight: 900; font-size: 12px; display: flex; align-items: center; gap: 8px; }
+
+    main { flex: 1; overflow-y: auto; padding: 5px 20px 180px; }
+    .card { background: var(--card); border-radius: 16px; border: 1px solid var(--border); margin-bottom: 12px; display: flex; overflow: hidden; cursor: pointer; }
+    .card-accent { width: 6px; }
+    .card-body { padding: 18px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+    .card-top { display: flex; justify-content: space-between; align-items: center; }
+    .card-id { color: var(--red); font-size: 18px; font-weight: 900; }
+    .card-price { font-size: 22px; font-weight: 900; }
+    .card-mid { color: var(--gray); font-size: 12px; font-weight: 600; line-height: 1.4; }
+    .card-km { color: var(--amber); font-weight: 900; margin-left: 5px; }
+
+    footer { position: absolute; bottom: 0; width: 100%; background: rgba(9,9,11,0.95); backdrop-filter: blur(20px); padding: 20px 25px calc(30px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+    .total-amount { font-size: 32px; font-weight: 900; letter-spacing: -1px; }
+    .fab { background: var(--red); width: 65px; height: 65px; border-radius: 20px; border: none; color: #fff; font-size: 28px; box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4); cursor: pointer; }
+
+    .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; display: flex; align-items: flex-end; }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .bottom-sheet { width: 100%; height: 92%; background: var(--bg); border-radius: 30px 30px 0 0; transform: translateY(100%); transition: 0.4s; padding: 25px; border-top: 1px solid var(--border); overflow-y: auto; }
+    .modal-overlay.active .bottom-sheet { transform: translateY(0); }
+    .sheet-header { display: flex; align-items: center; margin-bottom: 25px; }
+    .btn-close { background: var(--input); border: none; color: #fff; width: 45px; height: 45px; border-radius: 14px; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 18px; }
+    .sheet-title { flex: 1; text-align: center; font-weight: 900; font-size: 18px; color: var(--red); margin-right: 45px; }
+    
+    .input-group label { display: block; color: var(--gray); font-size: 10px; font-weight: 900; margin-bottom: 5px; text-transform: uppercase; }
+    .input-group input, .input-group select { width: 100%; background: var(--input); border: 1px solid var(--border); color: #fff; padding: 14px; border-radius: 12px; outline: none; font-size: 16px; margin-bottom: 15px; font-weight: 700; }
+    .toggle-row { display: flex; justify-content: space-between; align-items: center; background: var(--input); padding: 14px 20px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border); }
+    .toggle-btn { padding: 8px 15px; border-radius: 8px; border: none; font-weight: 900; cursor: pointer; transition: 0.3s; }
+    .toggle-btn.no { background: var(--red); color: #fff; }
+    .toggle-btn.si { background: var(--green); color: #fff; }
+    .btn-save { width: 100%; background: var(--red); color: #fff; border: none; padding: 20px; border-radius: 12px; font-size: 16px; font-weight: 900; margin-top: 10px; cursor: pointer; }
+    .btn-cancel { background: transparent; color: var(--gray); border: 1px solid var(--border); cursor: pointer; }
+    .btn-del-danger { width: 100%; background: transparent; color: var(--red); border: 1px solid var(--red); padding: 15px; border-radius: 12px; margin-top: 15px; font-weight: bold; text-align: center; }
+
+    #modal-confirm { align-items: center; justify-content: center; }
+    .confirm-box { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 30px; width: 85%; max-width: 350px; text-align: center; transform: scale(0.9); opacity: 0; transition: 0.3s; }
+    #modal-confirm.active .confirm-box { transform: scale(1); opacity: 1; }
+    .confirm-actions { display: flex; gap: 15px; margin-top: 20px; }
+    .confirm-actions button { flex: 1; padding: 16px; border-radius: 14px; font-weight: 900; border: none; cursor: pointer; }
+
+    #loading-overlay { position: fixed; inset: 0; background: #000; display: none; z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
+    .loader { border: 4px solid var(--card); border-top: 4px solid var(--red); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    .filter-label { display: block; color: var(--gray); font-size: 10px; font-weight: 900; margin-bottom: 8px; letter-spacing: 1px; }
+    .scroll-bar { display: flex; overflow-x: auto; gap: 8px; scrollbar-width: none; }
+    .chip { padding: 12px 18px; border-radius: 14px; font-size: 12px; font-weight: bold; background: var(--card); border: 1px solid var(--border); color: var(--gray); white-space: nowrap; cursor: pointer; }
+    .chip.active { background: var(--red); color: #fff; border-color: var(--red); }
+    .chip-sort.active { background: #fff; color: #000; border-color: #fff; }
+    .badge { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 6px; font-size: 10px; }
+</style>
+
+<script>
+    const API_KEY = 'AIzaSyCg2T_OVIV0C6Lmx-JCmV67nLiQDAwqbss';
+    const CLIENT_ID = '474241917322-l7ub2cma675eat9g7ht2q8po09a15qhl.apps.googleusercontent.com';
+    const DB_NAME = 'sos_database_vFINAL_CORREGIDA.json';
+
+    let tokenClient, gapiInited = false, gisInited = false, driveFileId = null;
+    let records = [], currentFilter = 'Todos', sortBy = 'FECHA', sortAsc = false, showAll = false;
+    let currentMonth = new Date().toISOString().substring(0, 7);
+    let dateFrom = '', dateTo = '';
+    let myChartBilling = null, myChartStatus = null;
+
+    window.onload = function() {
+        // Cargar datos locales de respaldo inmediatamente (Modo Offline)
+        const localData = localStorage.getItem('red_sos_cache');
+        if(localData) { records = JSON.parse(localData); render(); }
+
+        gapi.load('client', async () => {
+            await gapi.client.init({apiKey: API_KEY, discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']});
+            gapiInited = true; checkReady();
         });
-
-        window.addEventListener('online', () => { 
-            isOffline = false; 
-            showOfflineBanner(false); 
-            syncOfflineData(); 
+        tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: CLIENT_ID, scope: 'https://www.googleapis.com/auth/drive.file', callback: ''
         });
+        gisInited = true; checkReady();
+    };
 
-        function showOfflineBanner(show) {
-            let banner = document.getElementById('offline-banner');
-            if(!banner) {
-                banner = document.createElement('div');
-                banner.id = 'offline-banner';
-                banner.style.cssText = 'background: var(--red); color: white; text-align: center; padding: 10px; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; font-weight: bold; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);';
-                banner.innerHTML = '<i class="fa-solid fa-wifi" style="text-decoration: line-through; margin-right: 8px;"></i> MODO DESCONECTADO - Cambios locales';
-                document.body.prepend(banner);
-            }
-            banner.style.display = show ? 'block' : 'none';
+    // DETECTOR DE INTERNET
+    window.addEventListener('online', () => { document.getElementById('offline-banner').classList.remove('active'); syncData(); });
+    window.addEventListener('offline', () => { document.getElementById('offline-banner').classList.add('active'); });
+    if(!navigator.onLine) document.getElementById('offline-banner').classList.add('active');
+
+    function checkReady() { if(gapiInited && gisInited) { updateAuthUI(false); checkAuth(); } }
+    async function checkAuth() {
+        const token = localStorage.getItem('g_token');
+        if(token) { gapi.client.setToken({access_token: token}); updateAuthUI(true); syncData(); fetchUserInfo(); } 
+        else { render(); }
+    }
+
+    async function fetchUserInfo() {
+        try {
+            const res = await gapi.client.drive.about.get({ fields: 'user' });
+            if (res.result && res.result.user) document.getElementById('user-name-display').innerText = 'SESIÓN: ' + res.result.user.displayName.toUpperCase();
+        } catch (e) {}
+    }
+
+    function updateAuthUI(logged) { 
+        const btn = document.getElementById('auth-btn');
+        const textSpan = document.getElementById('auth-text');
+        if(logged) { btn.classList.add('logged-in'); textSpan.innerText = 'CERRAR SESIÓN'; } 
+        else { btn.classList.remove('logged-in'); textSpan.innerText = 'INICIAR SESIÓN'; document.getElementById('user-name-display').innerText = ''; }
+    }
+
+    function handleAuthClick() {
+        const token = localStorage.getItem('g_token');
+        if (token) { localStorage.removeItem('g_token'); gapi.client.setToken(null); records = []; driveFileId = null; updateAuthUI(false); render(); } 
+        else {
+            tokenClient.callback = async (r) => { if(r.error) return; localStorage.setItem('g_token', r.access_token); updateAuthUI(true); syncData(); fetchUserInfo(); };
+            tokenClient.requestAccessToken({prompt: gapi.client.getToken() ? '' : 'consent'});
         }
+    }
 
-        function loadLocalData() {
-            const localData = localStorage.getItem('sos_offline_records');
-            if (localData) { 
-                records = JSON.parse(localData); 
-                render(); 
-            }
-        }
-        // -----------------------------
-
-        window.onload = function() {
-            if (isOffline) { 
-                showOfflineBanner(true); 
-                loadLocalData(); 
-            }
-            try {
-                gapi.load('client', async () => {
-                    try {
-                        await gapi.client.init({apiKey: API_KEY, discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']});
-                        gapiInited = true; checkReady();
-                    } catch(e) { console.error("Error GAPI", e); }
-                });
-                tokenClient = google.accounts.oauth2.initTokenClient({
-                    client_id: CLIENT_ID, scope: 'https://www.googleapis.com/auth/drive.file', callback: ''
-                });
-                gisInited = true; checkReady();
-            } catch(err) { console.error("Error Google Load", err); }
-        };
-
-        function checkReady() { if(gapiInited && gisInited) { updateAuthUI(false); checkAuth(); } }
-
-        async function checkAuth() {
-            const token = localStorage.getItem('g_token');
-            if(token) { gapi.client.setToken({access_token: token}); updateAuthUI(true); syncData(); fetchUserInfo(); } 
-            else { render(); }
-        }
-
-        async function fetchUserInfo() {
-            try {
-                const res = await gapi.client.drive.about.get({ fields: 'user' });
-                if (res.result && res.result.user) { 
-                    document.getElementById('user-name-display').innerText = 'SESIÓN: ' + res.result.user.displayName.toUpperCase(); 
-                }
-            } catch (e) { console.log("No se pudo obtener el nombre del usuario"); }
-        }
-
-        function updateAuthUI(logged) { 
-            const btn = document.getElementById('auth-btn'); const textSpan = document.getElementById('auth-text');
-            if(logged) { btn.classList.add('logged-in'); textSpan.innerText = 'CERRAR SESIÓN'; } 
-            else { btn.classList.remove('logged-in'); textSpan.innerText = 'INICIAR SESIÓN'; document.getElementById('user-name-display').innerText = ''; }
-        }
-
-        function handleAuthClick() {
-            const token = localStorage.getItem('g_token');
-            if (token) {
-                localStorage.removeItem('g_token'); gapi.client.setToken(null);
-                records = []; driveFileId = null; updateAuthUI(false); render();
+    async function syncData() {
+        if(!navigator.onLine) return;
+        document.getElementById('loading-overlay').style.display = 'flex';
+        try {
+            const res = await gapi.client.drive.files.list({ q: `name = '${DB_NAME}' and trashed = false` });
+            if(res.result.files && res.result.files.length > 0) {
+                driveFileId = res.result.files[0].id;
+                const content = await gapi.client.drive.files.get({ fileId: driveFileId, alt: 'media' });
+                records = Array.isArray(content.result) ? content.result : [];
+                localStorage.setItem('red_sos_cache', JSON.stringify(records));
             } else {
-                tokenClient.callback = async (r) => { 
-                    if(r.error) return; 
-                    localStorage.setItem('g_token', r.access_token); updateAuthUI(true); syncData(); fetchUserInfo();
-                };
-                tokenClient.requestAccessToken({prompt: gapi.client.getToken() ? '' : 'consent'});
+                const meta = { name: DB_NAME, mimeType: 'application/json' };
+                const file = await gapi.client.drive.files.create({ resource: meta, fields: 'id' });
+                driveFileId = file.result.id;
             }
-        }
+            render();
+        } catch(e) {}
+        document.getElementById('loading-overlay').style.display = 'none';
+    }
 
-        async function syncData() {
-            if (isOffline) return loadLocalData();
-
-            document.getElementById('loading-overlay').style.display = 'flex';
-            try {
-                const res = await gapi.client.drive.files.list({ q: `name = '${DB_NAME}' and trashed = false` });
-                if(res.result.files && res.result.files.length > 0) {
-                    driveFileId = res.result.files[0].id;
-                    const content = await gapi.client.drive.files.get({ fileId: driveFileId, alt: 'media' });
-                    records = Array.isArray(content.result) ? content.result : [];
-                    localStorage.setItem('sos_offline_records', JSON.stringify(records)); 
-                } else {
-                    const meta = { name: DB_NAME, mimeType: 'application/json' };
-                    const file = await gapi.client.drive.files.create({ resource: meta, fields: 'id' });
-                    driveFileId = file.result.id; records = [];
-                }
-                render(); 
-                syncOfflineData();
-            } catch(e) { console.error(e); }
-            document.getElementById('loading-overlay').style.display = 'none';
-        }
-
-        async function saveToDrive() {
-            localStorage.setItem('sos_offline_records', JSON.stringify(records));
-            
-            if (isOffline) { 
-                localStorage.setItem('sos_pending_sync', 'true'); 
-                return; 
-            }
-            
-            if(!driveFileId || !gapi.client.getToken()) return;
-            try {
-                await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
-                    method: 'PATCH', headers: { 'Authorization': `Bearer ${gapi.client.getToken().access_token}` }, 
-                    body: JSON.stringify(records)
-                });
-                localStorage.removeItem('sos_pending_sync');
-            } catch(e) { 
-                console.error("Error guardando en Drive", e); 
-                localStorage.setItem('sos_pending_sync', 'true'); 
-            }
-        }
-
-        async function syncOfflineData() {
-            const needsSync = localStorage.getItem('sos_pending_sync');
-            if (needsSync === 'true' && driveFileId && gapi.client.getToken()) {
-                document.getElementById('loading-overlay').style.display = 'flex';
-                await saveToDrive();
-                document.getElementById('loading-overlay').style.display = 'none';
-                alert("¡Conexión recuperada! Los datos se sincronizaron con Google Drive.");
-            }
-        }
-
-        function toggleMenu() { document.getElementById('main-menu').classList.toggle('active'); }
-        window.onclick = function(e) { 
-            if (!e.target.matches('#menu-btn') && !e.target.matches('#menu-btn i')) { 
-                const menu = document.getElementById('main-menu'); 
-                if(menu) menu.classList.remove('active'); 
-            } 
-        }
-        function openFilters() { document.getElementById('modal-filtros').classList.add('active'); }
-        function closeFilters() { document.getElementById('modal-filtros').classList.remove('active'); }
-
-        function applyDateRange() {
-            dateFrom = document.getElementById('filter-desde').value; dateTo = document.getElementById('filter-hasta').value;
-            if(!dateFrom || !dateTo) return alert("Seleccioná ambas fechas."); showAll = false; render(); closeFilters();
-        }
-        function clearDateRange() {
-            dateFrom = ''; dateTo = ''; document.getElementById('filter-desde').value = ''; document.getElementById('filter-hasta').value = ''; render();
-        }
-
-        function openDashboard() { document.getElementById('modal-dashboard').classList.add('active'); processAnalytics(); }
-        function closeDashboard() { document.getElementById('modal-dashboard').classList.remove('active'); }
-
-        function processAnalytics() {
-            let dataDash = records;
-            if (dateFrom && dateTo) dataDash = dataDash.filter(r => (r.fecha||'') >= dateFrom && (r.fecha||'') <= dateTo);
-            else if (!showAll) dataDash = dataDash.filter(r => (r.fecha||'').startsWith(currentMonth));
-
-            if (!dataDash.length) return;
-            const totalDinero = dataDash.reduce((s, r) => s + parseFloat(r.monto || 0), 0);
-            document.getElementById('dash-promedio').innerText = '$' + (totalDinero / dataDash.length).toLocaleString('es-AR', {maximumFractionDigits:0});
-
-            const vehiculos = {};
-            dataDash.forEach(r => { if(r.vehiculo) vehiculos[r.vehiculo] = (vehiculos[r.vehiculo] || 0) + 1; });
-            const topV = Object.keys(vehiculos).sort((a,b) => vehiculos[b] - vehiculos[a])[0] || "N/A";
-            document.getElementById('dash-top-v').innerText = topV.toUpperCase();
-
-            const meses = {};
-            records.forEach(r => { if(r.fecha) { const m = r.fecha.substring(0, 7); meses[m] = (meses[m] || 0) + parseFloat(r.monto || 0); } });
-            const labelsMeses = Object.keys(meses).sort().slice(-6);
-            const dataMeses = labelsMeses.map(m => meses[m]);
-
-            if(myChartBilling) myChartBilling.destroy();
-            myChartBilling = new Chart(document.getElementById('chart-billing'), { type: 'bar', data: { labels: labelsMeses, datasets: [{ label: 'Facturación $', data: dataMeses, backgroundColor: '#f59e0b', borderRadius: 6 }] }, options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#27272a' } } } } });
-
-            const cobrados = dataDash.filter(r => r.cobrado === 'SI').length;
-            if(myChartStatus) myChartStatus.destroy();
-            myChartStatus = new Chart(document.getElementById('chart-status'), { type: 'doughnut', data: { labels: ['Cobrado', 'Pendiente'], datasets: [{ data: [cobrados, dataDash.length - cobrados], backgroundColor: ['#10b981', '#ef4444'], borderWidth: 0 }] }, options: { cutout: '75%', plugins: { legend: { position: 'bottom', labels: { color: '#a1a1aa', font: { weight: 'bold' } } } } } });
-        }
-
-        function render() {
-            const searchVal = document.getElementById('main-search').value.toLowerCase();
-            let data = records;
-
-            if (dateFrom && dateTo) {
-                data = data.filter(r => (r.fecha||'') >= dateFrom && (r.fecha||'') <= dateTo);
-                document.getElementById('current-month-display').innerText = `${dateFrom.split('-').reverse().join('/').substring(0,5)} al ${dateTo.split('-').reverse().join('/').substring(0,5)}`;
-            } else if (!showAll) {
-                data = data.filter(r => (r.fecha||'').startsWith(currentMonth));
-                document.getElementById('current-month-display').innerText = currentMonth;
-            } else {
-                document.getElementById('current-month-display').innerText = "HISTORIAL COMPLETO";
-            }
-
-            if(searchVal) {
-                data = data.filter(r => (r.patente && r.patente.toLowerCase().includes(searchVal)) || (r.vehiculo && r.vehiculo.toLowerCase().includes(searchVal)) || (r.servicio && r.servicio.toString().includes(searchVal)));
-            }
-
-            const penMonto = data.filter(x => x.cobrado === 'NO').reduce((s,r) => s + parseFloat(r.monto || 0), 0);
-            const cobMonto = data.filter(x => x.cobrado === 'SI').reduce((s,r) => s + parseFloat(r.monto || 0), 0);
-            document.getElementById('stat-pendiente').innerText = '$' + penMonto.toLocaleString('es-AR');
-            document.getElementById('stat-cobrado').innerText = '$' + cobMonto.toLocaleString('es-AR');
-
-            document.getElementById('c-Todos').innerText = data.length;
-            document.getElementById('c-Pendiente').innerText = data.filter(x => x.estado === 'Pendiente').length;
-            document.getElementById('c-Terminado').innerText = data.filter(x => x.estado === 'Terminado').length;
-            if(currentFilter !== 'Todos') data = data.filter(r => r.estado === currentFilter);
-
-            data.sort((a,b) => {
-                let res = sortBy === 'FECHA' ? (a.fecha||'').localeCompare(b.fecha||'') : (sortBy === 'MONTO' ? parseFloat(a.monto||0) - parseFloat(b.monto||0) : parseInt(a.servicio||0) - parseInt(b.servicio||0));
-                return sortAsc ? res : -res;
+    async function saveToDrive() {
+        // Guardar siempre en local primero (Offline)
+        localStorage.setItem('red_sos_cache', JSON.stringify(records));
+        if(!driveFileId || !gapi.client.getToken() || !navigator.onLine) return;
+        try {
+            await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
+                method: 'PATCH', headers: { 'Authorization': `Bearer ${gapi.client.getToken().access_token}` }, 
+                body: JSON.stringify(records)
             });
+        } catch(e) {}
+    }
 
-            const container = document.getElementById('list-container');
-            container.innerHTML = data.length ? '' : '<p style="text-align:center; margin-top:50px; color:#3f3f46; font-weight:900; font-size:30px;">SIN DATOS</p>';
+    function toggleMenu() { document.getElementById('main-menu').classList.toggle('active'); }
+    window.onclick = function(e) { if (!e.target.matches('#menu-btn') && !e.target.matches('#menu-btn i')) document.getElementById('main-menu').classList.remove('active'); }
+    function openFilters() { document.getElementById('modal-filtros').classList.add('active'); }
+    function closeFilters() { document.getElementById('modal-filtros').classList.remove('active'); }
 
-            data.forEach(r => {
-                const color = r.estado === 'Terminado' ? 'var(--green)' : (r.estado === 'En Curso' ? 'var(--amber)' : 'var(--red)');
-                const div = document.createElement('div'); div.className = 'card';
-                div.innerHTML = `<div class="card-accent" style="background:${color}"></div>
-                    <div class="card-body" onclick="openForm('${r.id}')">
-                        <div class="card-top"><span class="card-id">#${r.servicio||'0'}</span><span class="card-price">$${parseFloat(r.monto||0).toLocaleString('es-AR')}</span></div>
-                        <div class="card-mid"><i class="fa-solid fa-car"></i> <b>${r.patente || 'S/P'}</b> | ${r.vehiculo || 'S/D'}<br><i class="fa-solid fa-calendar"></i> ${(r.fecha||'').split('-').reverse().join('/')} <span class="card-km"> <i class="fa-solid fa-route"></i> ${r.km || 0} km</span></div>
-                    </div>`;
-                container.appendChild(div);
-            });
-            document.getElementById('total-monto').innerText = '$' + data.reduce((s, r) => s + parseFloat(r.monto || 0), 0).toLocaleString('es-AR', {minimumFractionDigits: 2});
+    function applyDateRange() {
+        dateFrom = document.getElementById('filter-desde').value; dateTo = document.getElementById('filter-hasta').value;
+        if(!dateFrom || !dateTo) return alert("Seleccioná ambas fechas."); showAll = false; render(); closeFilters();
+    }
+    function clearDateRange() { dateFrom = ''; dateTo = ''; document.getElementById('filter-desde').value = ''; document.getElementById('filter-hasta').value = ''; render(); }
+
+    function openDashboard() { document.getElementById('modal-dashboard').classList.add('active'); processAnalytics(); }
+    function closeDashboard() { document.getElementById('modal-dashboard').classList.remove('active'); }
+
+    function processAnalytics() {
+        let dataDash = records;
+        if (dateFrom && dateTo) dataDash = dataDash.filter(r => (r.fecha||'') >= dateFrom && (r.fecha||'') <= dateTo);
+        else if (!showAll) dataDash = dataDash.filter(r => (r.fecha||'').startsWith(currentMonth));
+        if (!dataDash.length) return;
+        const totalDinero = dataDash.reduce((s, r) => s + parseFloat(r.monto || 0), 0);
+        document.getElementById('dash-promedio').innerText = '$' + (totalDinero / dataDash.length).toLocaleString('es-AR', {maximumFractionDigits:0});
+        const vehiculos = {};
+        dataDash.forEach(r => { if(r.vehiculo) vehiculos[r.vehiculo] = (vehiculos[r.vehiculo] || 0) + 1; });
+        const topV = Object.keys(vehiculos).sort((a,b) => vehiculos[b] - vehiculos[a])[0] || "N/A";
+        document.getElementById('dash-top-v').innerText = topV.toUpperCase();
+        const meses = {};
+        records.forEach(r => { if(r.fecha) { const m = r.fecha.substring(0, 7); meses[m] = (meses[m] || 0) + parseFloat(r.monto || 0); } });
+        const labelsMeses = Object.keys(meses).sort().slice(-6);
+        const dataMeses = labelsMeses.map(m => meses[m]);
+        if(myChartBilling) myChartBilling.destroy();
+        myChartBilling = new Chart(document.getElementById('chart-billing'), { type: 'bar', data: { labels: labelsMeses, datasets: [{ label: 'Facturación $', data: dataMeses, backgroundColor: '#f59e0b', borderRadius: 6 }] }, options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#27272a' } } } } });
+        const cobrados = dataDash.filter(r => r.cobrado === 'SI').length;
+        if(myChartStatus) myChartStatus.destroy();
+        myChartStatus = new Chart(document.getElementById('chart-status'), { type: 'doughnut', data: { labels: ['Cobrado', 'Pendiente'], datasets: [{ data: [cobrados, dataDash.length - cobrados], backgroundColor: ['#10b981', '#ef4444'], borderWidth: 0 }] }, options: { cutout: '75%', plugins: { legend: { position: 'bottom', labels: { color: '#a1a1aa', font: { weight: 'bold' } } } } } });
+    }
+
+    function render() {
+        const searchVal = document.getElementById('main-search').value.toLowerCase();
+        let data = records;
+        if (dateFrom && dateTo) {
+            data = data.filter(r => (r.fecha||'') >= dateFrom && (r.fecha||'') <= dateTo);
+            document.getElementById('current-month-display').innerText = `${dateFrom.split('-').reverse().join('/').substring(0,5)} al ${dateTo.split('-').reverse().join('/').substring(0,5)}`;
+        } else if (!showAll) {
+            data = data.filter(r => (r.fecha||'').startsWith(currentMonth));
+            document.getElementById('current-month-display').innerText = currentMonth;
+        } else {
+            document.getElementById('current-month-display').innerText = "HISTORIAL COMPLETO";
         }
+        if(searchVal) data = data.filter(r => (r.patente && r.patente.toLowerCase().includes(searchVal)) || (r.vehiculo && r.vehiculo.toLowerCase().includes(searchVal)) || (r.servicio && r.servicio.toString().includes(searchVal)));
+        const penMonto = data.filter(x => x.cobrado === 'NO').reduce((s,r) => s + parseFloat(r.monto || 0), 0);
+        const cobMonto = data.filter(x => x.cobrado === 'SI').reduce((s,r) => s + parseFloat(r.monto || 0), 0);
+        document.getElementById('stat-pendiente').innerText = '$' + penMonto.toLocaleString('es-AR');
+        document.getElementById('stat-cobrado').innerText = '$' + cobMonto.toLocaleString('es-AR');
+        document.getElementById('c-Todos').innerText = data.length;
+        document.getElementById('c-Pendiente').innerText = data.filter(x => x.estado === 'Pendiente').length;
+        document.getElementById('c-Terminado').innerText = data.filter(x => x.estado === 'Terminado').length;
+        if(currentFilter !== 'Todos') data = data.filter(r => r.estado === currentFilter);
+        data.sort((a,b) => {
+            let res = sortBy === 'FECHA' ? (a.fecha||'').localeCompare(b.fecha||'') : (sortBy === 'MONTO' ? parseFloat(a.monto||0) - parseFloat(b.monto||0) : parseInt(a.servicio||0) - parseInt(b.servicio||0));
+            return sortAsc ? res : -res;
+        });
+        const container = document.getElementById('list-container');
+        container.innerHTML = data.length ? '' : '<p style="text-align:center; margin-top:50px; color:#3f3f46; font-weight:900; font-size:30px;">SIN DATOS</p>';
+        data.forEach(r => {
+            const color = r.estado === 'Terminado' ? 'var(--green)' : (r.estado === 'En Curso' ? 'var(--amber)' : 'var(--red)');
+            const div = document.createElement('div'); div.className = 'card';
+            div.innerHTML = `<div class="card-accent" style="background:${color}"></div>
+                <div class="card-body" onclick="openForm('${r.id}')">
+                    <div class="card-top"><span class="card-id">#${r.servicio||'0'}</span><span class="card-price">$${parseFloat(r.monto||0).toLocaleString('es-AR')}</span></div>
+                    <div class="card-mid"><i class="fa-solid fa-car"></i> <b>${r.patente || 'S/P'}</b> | ${r.vehiculo || 'S/D'}<br><i class="fa-solid fa-calendar"></i> ${(r.fecha||'').split('-').reverse().join('/')} <span class="card-km"> <i class="fa-solid fa-route"></i> ${r.km || 0} km</span></div>
+                </div>`;
+            container.appendChild(div);
+        });
+        document.getElementById('total-monto').innerText = '$' + data.reduce((s, r) => s + parseFloat(r.monto || 0), 0).toLocaleString('es-AR', {minimumFractionDigits: 2});
+    }
 
-        function toggleAllMonths() { showAll = !showAll; clearDateRange(); }
-        function changeMonth(d) { clearDateRange(); let [y, m] = currentMonth.split('-').map(Number); m += d; if(m>12){m=1;y++} else if(m<1){m=12;y--} currentMonth = `${y}-${String(m).padStart(2,'0')}`; showAll = false; render(); }
-        function setFilter(f) { currentFilter = f; document.querySelectorAll('.chip-filter').forEach(c => c.classList.remove('active')); const el = document.getElementById(`f-${f}`); if(el) el.classList.add('active'); render(); closeFilters(); }
-        function setSort(s) {
-            if (sortBy === s) sortAsc = !sortAsc; else { sortBy = s; sortAsc = false; }
-            document.querySelectorAll('.chip-sort').forEach(chip => { chip.classList.remove('active'); let t = chip.innerText.replace(' ↑', '').replace(' ↓', ''); if (chip.id === `sort-${s}`) { chip.classList.add('active'); chip.innerText = t + (sortAsc ? ' ↑' : ' ↓'); } else { chip.innerText = t; } });
-            render(); closeFilters();
+    function toggleAllMonths() { showAll = !showAll; clearDateRange(); }
+    function changeMonth(d) { clearDateRange(); let [y, m] = currentMonth.split('-').map(Number); m += d; if(m>12){m=1;y++} else if(m<1){m=12;y--} currentMonth = `${y}-${String(m).padStart(2,'0')}`; showAll = false; render(); }
+    function setFilter(f) { currentFilter = f; document.querySelectorAll('.chip-filter').forEach(c => c.classList.remove('active')); document.getElementById(`f-${f}`).classList.add('active'); render(); closeFilters(); }
+    function setSort(s) { if (sortBy === s) sortAsc = !sortAsc; else { sortBy = s; sortAsc = false; } document.querySelectorAll('.chip-sort').forEach(chip => { chip.classList.remove('active'); let t = chip.innerText.replace(' ↑', '').replace(' ↓', ''); if (chip.id === `sort-${s}`) { chip.classList.add('active'); chip.innerText = t + (sortAsc ? ' ↑' : ' ↓'); } else { chip.innerText = t; } }); render(); closeFilters(); }
+
+    function toggleBtn(btn) { btn.innerText = btn.innerText === 'SI' ? 'NO' : 'SI'; btn.className = 'toggle-btn ' + (btn.innerText === 'SI' ? 'si' : 'no'); }
+    function openForm(id = null) {
+        document.getElementById('btn-del').style.display = id ? 'block' : 'none';
+        document.getElementById('btn-pdf').style.display = id ? 'block' : 'none';
+        if(id) {
+            const r = records.find(x => x.id === id);
+            document.getElementById('f-id').value = r.id; document.getElementById('f-fecha').value = r.fecha; document.getElementById('f-servicio').value = r.servicio; document.getElementById('f-monto').value = r.monto; document.getElementById('f-patente').value = r.patente; document.getElementById('f-vehiculo').value = r.vehiculo || ''; document.getElementById('f-km').value = r.km || ''; document.getElementById('f-motivo').value = r.motivo; document.getElementById('f-estado').value = r.estado;
+            document.getElementById('f-conciliado').innerText = r.conciliado || 'NO'; document.getElementById('f-conciliado').className = 'toggle-btn ' + (r.conciliado === 'SI' ? 'si' : 'no');
+            document.getElementById('f-cobrado').innerText = r.cobrado || 'NO'; document.getElementById('f-cobrado').className = 'toggle-btn ' + (r.cobrado === 'SI' ? 'si' : 'no');
+        } else {
+            document.getElementById('f-id').value = ''; document.getElementById('f-fecha').value = new Date().toISOString().substring(0,10); document.getElementById('f-servicio').value = ''; document.getElementById('f-monto').value = ''; document.getElementById('f-patente').value = ''; document.getElementById('f-vehiculo').value = ''; document.getElementById('f-km').value = ''; document.getElementById('f-motivo').value = ''; document.getElementById('f-estado').value = 'Pendiente';
+            document.getElementById('f-conciliado').innerText = 'NO'; document.getElementById('f-conciliado').className = 'toggle-btn no'; document.getElementById('f-cobrado').innerText = 'NO'; document.getElementById('f-cobrado').className = 'toggle-btn no';
         }
+        document.getElementById('modal-form').classList.add('active');
+    }
+    function closeForm() { document.getElementById('modal-form').classList.remove('active'); }
+    function openConfirm() { document.getElementById('modal-confirm').classList.add('active'); }
+    function closeConfirm() { document.getElementById('modal-confirm').classList.remove('active'); }
+    
+    async function saveRecord() {
+        const id = document.getElementById('f-id').value;
+        const data = { id: id || Math.random().toString(36).substr(2, 9), fecha: document.getElementById('f-fecha').value, servicio: document.getElementById('f-servicio').value || '0', monto: document.getElementById('f-monto').value || 0, patente: document.getElementById('f-patente').value.toUpperCase(), vehiculo: document.getElementById('f-vehiculo').value, km: document.getElementById('f-km').value || 0, motivo: document.getElementById('f-motivo').value, estado: document.getElementById('f-estado').value, conciliado: document.getElementById('f-conciliado').innerText, cobrado: document.getElementById('f-cobrado').innerText };
+        if(id) records = records.map(r => r.id === id ? data : r); else records.push(data);
+        closeForm(); render(); await saveToDrive();
+    }
+    async function confirmDelete() { closeConfirm(); records = records.filter(r => r.id !== document.getElementById('f-id').value); closeForm(); render(); await saveToDrive(); }
 
-        function toggleBtn(btn) { btn.innerText = btn.innerText === 'SI' ? 'NO' : 'SI'; btn.className = 'toggle-btn ' + (btn.innerText === 'SI' ? 'si' : 'no'); }
+    function generatePDF() {
+        document.getElementById('loading-overlay').style.display = 'flex';
+        document.getElementById('pdf-nro').innerText = document.getElementById('f-servicio').value || 'S/N';
+        document.getElementById('pdf-fecha').innerText = document.getElementById('f-fecha').value.split('-').reverse().join('/');
+        document.getElementById('pdf-vehiculo').innerText = document.getElementById('f-vehiculo').value || 'S/D';
+        document.getElementById('pdf-patente').innerText = document.getElementById('f-patente').value || 'S/P';
+        document.getElementById('pdf-km').innerText = document.getElementById('f-km').value + ' km';
+        document.getElementById('pdf-motivo').innerText = document.getElementById('f-motivo').value || 'Asistencia';
+        document.getElementById('pdf-monto').innerText = '$' + parseFloat(document.getElementById('f-monto').value || 0).toLocaleString('es-AR', {minimumFractionDigits: 2});
+        const est = document.getElementById('f-cobrado').innerText;
+        document.getElementById('pdf-estado').innerText = est === 'SI' ? 'PAGADO' : 'PENDIENTE';
+        document.getElementById('pdf-estado').style.color = est === 'SI' ? '#10b981' : '#ef4444';
+        html2pdf().set({ margin: 0.5, filename: `RedSOS_${document.getElementById('pdf-nro').innerText}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, windowWidth: 700 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(document.getElementById('pdf-template')).save().then(() => { document.getElementById('loading-overlay').style.display = 'none'; });
+    }
 
-        function openForm(id = null) {
-            document.getElementById('btn-del').style.display = id ? 'block' : 'none';
-            document.getElementById('btn-pdf').style.display = id ? 'block' : 'none';
-            if(id) {
-                const r = records.find(x => x.id === id);
-                document.getElementById('f-id').value = r.id; document.getElementById('f-fecha').value = r.fecha; document.getElementById('f-servicio').value = r.servicio; document.getElementById('f-monto').value = r.monto; document.getElementById('f-patente').value = r.patente; document.getElementById('f-vehiculo').value = r.vehiculo || ''; document.getElementById('f-km').value = r.km || ''; document.getElementById('f-motivo').value = r.motivo; document.getElementById('f-estado').value = r.estado;
-                document.getElementById('f-conciliado').innerText = r.conciliado || 'NO'; document.getElementById('f-conciliado').className = 'toggle-btn ' + (r.conciliado === 'SI' ? 'si' : 'no');
-                document.getElementById('f-cobrado').innerText = r.cobrado || 'NO'; document.getElementById('f-cobrado').className = 'toggle-btn ' + (r.cobrado === 'SI' ? 'si' : 'no');
-            } else {
-                document.getElementById('f-id').value = ''; document.getElementById('f-fecha').value = new Date().toISOString().substring(0,10); document.getElementById('f-servicio').value = ''; document.getElementById('f-monto').value = ''; document.getElementById('f-patente').value = ''; document.getElementById('f-vehiculo').value = ''; document.getElementById('f-km').value = ''; document.getElementById('f-motivo').value = ''; document.getElementById('f-estado').value = 'Pendiente';
-                document.getElementById('f-conciliado').innerText = 'NO'; document.getElementById('f-conciliado').className = 'toggle-btn no'; document.getElementById('f-cobrado').innerText = 'NO'; document.getElementById('f-cobrado').className = 'toggle-btn no';
-            }
-            document.getElementById('modal-form').classList.add('active');
-        }
-        function closeForm() { document.getElementById('modal-form').classList.remove('active'); }
-        function openConfirm() { document.getElementById('modal-confirm').classList.add('active'); }
-        function closeConfirm() { document.getElementById('modal-confirm').classList.remove('active'); }
-
-        async function saveRecord() {
-            const id = document.getElementById('f-id').value;
-            const data = { 
-                id: id || Math.random().toString(36).substr(2, 9), 
-                fecha: document.getElementById('f-fecha').value, 
-                servicio: document.getElementById('f-servicio').value || '0', 
-                monto: document.getElementById('f-monto').value || 0, 
-                patente: document.getElementById('f-patente').value.toUpperCase(), 
-                vehiculo: document.getElementById('f-vehiculo').value, 
-                km: document.getElementById('f-km').value || 0, 
-                motivo: document.getElementById('f-motivo').value, 
-                estado: document.getElementById('f-estado').value, 
-                conciliado: document.getElementById('f-conciliado').innerText, 
-               cobrado: document.getElementById('f-cobrado').innerText 
-            };
-            if(id) records = records.map(r => r.id === id ? data : r); else records.push(data);
-            closeForm(); render(); await saveToDrive();
-        }
-
-        async function confirmDelete() { 
-            closeConfirm(); 
-            records = records.filter(r => r.id !== document.getElementById('f-id').value); 
-            closeForm(); render(); await saveToDrive(); 
-        }
-
-        function generatePDF() {
-            if(typeof html2pdf === 'undefined') return alert("La librería PDF aún no cargó. Intentá en un segundo.");
-            document.getElementById('loading-overlay').style.display = 'flex';
-            
-            document.getElementById('pdf-nro').innerText = document.getElementById('f-servicio').value || 'S/N';
-            document.getElementById('pdf-fecha').innerText = document.getElementById('f-fecha').value.split('-').reverse().join('/');
-            document.getElementById('pdf-vehiculo').innerText = document.getElementById('f-vehiculo').value || 'Sin especificar';
-            document.getElementById('pdf-patente').innerText = document.getElementById('f-patente').value || 'S/P';
-            document.getElementById('pdf-km').innerText = document.getElementById('f-km').value + ' km';
-            document.getElementById('pdf-motivo').innerText = document.getElementById('f-motivo').value || 'Asistencia mecánica';
-            document.getElementById('pdf-monto').innerText = '$' + parseFloat(document.getElementById('f-monto').value || 0).toLocaleString('es-AR', {minimumFractionDigits: 2});
-            
-            const est = document.getElementById('f-cobrado').innerText;
-            document.getElementById('pdf-estado').innerText = est === 'SI' ? 'PAGADO' : 'PENDIENTE DE PAGO';
-            document.getElementById('pdf-estado').style.color = est === 'SI' ? '#10b981' : '#e11d48';
-
-            html2pdf().set({ 
-                margin: 0.5, 
-                filename: `RedSOS_Comprobante_${document.getElementById('pdf-nro').innerText}.pdf`, 
-                image: { type: 'jpeg', quality: 0.98 }, 
-                html2canvas: { scale: 2, windowWidth: 700 }, 
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } 
-            }).from(document.getElementById('pdf-template')).save().then(() => { 
-                document.getElementById('loading-overlay').style.display = 'none'; 
-            });
-        }
-
-        function exportToCSV() {
-            if (!records.length) return alert("No hay datos."); 
-            let csv = "ID,FECHA,SERVICIO,MONTO,PATENTE,VEHICULO,KM,MOTIVO,ESTADO,CONCILIADO,COBRADO\n";
-            records.forEach(r => { 
-                csv += `${r.id},${r.fecha||''},${r.servicio||''},${r.monto||''},${r.patente||''},${r.vehiculo||''},${r.km||''},"${(r.motivo||'').replace(/"/g, '""')}",${r.estado||''},${r.conciliado||''},${r.cobrado||''}\n`; 
-            });
-            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-            const a = document.createElement("a"); 
-            a.href = URL.createObjectURL(blob); 
-            a.download = `RedSOS_Reporte.csv`; 
-            a.click();
-        }
-
-        function exportBackup() {
-            if (!records.length) return alert("No hay datos.");
-            const a = document.createElement("a"); 
-            a.href = URL.createObjectURL(new Blob([JSON.stringify(records)], { type: 'application/json' })); 
-            a.download = `RedSOS_Backup.json`; 
-            a.click();
-        }
-
-        function importBackup(event) {
-            const f = event.target.files[0]; if (!f) return;
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                try { 
-                    const imp = JSON.parse(e.target.result); 
-                    if (Array.isArray(imp)) { 
-                        if (confirm("Sumar a base actual? Cancelar reemplaza todo.")) { 
-                            const ids = new Set(records.map(r => r.id)); 
-                            imp.forEach(n => { if (!ids.has(n.id)) records.push(n); }); 
-                        } else { 
-                            records = imp; 
-                        } 
-                        document.getElementById('loading-overlay').style.display = 'flex'; 
-                        await saveToDrive(); 
-                        render(); 
-                    } 
-                } catch (e) { alert("Archivo inválido."); }
-                document.getElementById('loading-overlay').style.display = 'none'; event.target.value = '';
-            }; 
-            reader.readAsText(f);
-        }
-    </script>
+    function exportToCSV() {
+        let csv = "ID,FECHA,SERVICIO,MONTO,PATENTE,VEHICULO,KM,MOTIVO,ESTADO,CONCILIADO,COBRADO\n";
+        records.forEach(r => { csv += `${r.id},${r.fecha||''},${r.servicio||''},${r.monto||''},${r.patente||''},${r.vehiculo||''},${r.km||''},"${(r.motivo||'').replace(/"/g, '""')}",${r.estado||''},${r.conciliado||''},${r.cobrado||''}\n`; });
+        const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = `RedSOS_Reporte.csv`; a.click();
+    }
+    function exportBackup() { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(records)], { type: 'application/json' })); a.download = `RedSOS_Backup.json`; a.click(); }
+    function importBackup(event) {
+        const f = event.target.files[0]; if (!f) return;
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            try { const imp = JSON.parse(e.target.result); if (confirm("¿Sumar a base actual?")) { const ids = new Set(records.map(r => r.id)); imp.forEach(n => { if (!ids.has(n.id)) records.push(n); }); } else { records = imp; } await saveToDrive(); render(); } catch (e) { alert("Inválido"); }
+            event.target.value = '';
+        }; reader.readAsText(f);
+    }
+</script>
 </body>
 </html>

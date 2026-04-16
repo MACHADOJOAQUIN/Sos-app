@@ -44,7 +44,7 @@
     </header>
 
     <div id="offline-banner">
-        <i class="fa-solid fa-wifi-slash"></i> MODO SIN CONEXIÓN: Los datos se sincronizarán al volver
+        <i class="fa-solid fa-wifi-slash"></i> SIN CONEXIÓN: Usando datos del equipo
     </div>
 
     <div class="search-container">
@@ -101,8 +101,8 @@
                     <div class="input-group"><label>HASTA</label><input type="date" id="filter-hasta"></div>
                 </div>
                 <div style="display: flex; gap: 10px; margin-bottom: 25px;">
-                    <button class="btn-cancel" style="flex:1; padding:12px; border-radius:12px; font-size:12px" onclick="clearDateRange()">LIMPIAR</button>
-                    <button class="btn-save" style="flex:1; margin-top:0; padding:12px; border-radius:12px; font-size:12px" onclick="applyDateRange()">APLICAR</button>
+                    <button class="btn-cancel" style="flex: 1; padding: 12px; border-radius: 12px;" onclick="clearDateRange()">LIMPIAR</button>
+                    <button class="btn-save" style="flex: 1; margin-top: 0; padding: 12px; border-radius: 12px;" onclick="applyDateRange()">APLICAR</button>
                 </div>
                 <label class="filter-label">ORDENAR POR:</label>
                 <div class="scroll-bar" style="margin-bottom: 25px;">
@@ -154,7 +154,7 @@
                     <div class="input-group"><label>PATENTE</label><input type="text" id="f-patente"></div>
                     <div class="input-group"><label>KM</label><input type="number" id="f-km" placeholder="0"></div>
                 </div>
-                <div class="input-group"><label>VEHÍCULO (MARCA/MODELO)</label><input type="text" id="f-vehiculo"></div>
+                <div class="input-group"><label>VEHÍCULO</label><input type="text" id="f-vehiculo"></div>
                 <div class="input-group"><label>MOTIVO / DETALLE</label><input type="text" id="f-motivo"></div>
                 <div class="input-group">
                     <label>ESTADO</label>
@@ -168,7 +168,7 @@
                 <div class="toggle-row"><span>Cobrado</span><button type="button" id="f-cobrado" class="toggle-btn no" onclick="toggleBtn(this)">NO</button></div>
                 
                 <button class="btn-save" onclick="saveRecord()">✓ GUARDAR CAMBIOS</button>
-                <button type="button" id="btn-pdf" class="btn-save" style="background: var(--amber); color: #000; display: none; margin-top: 10px;" onclick="generatePDF()"><i class="fa-solid fa-file-pdf"></i> GENERAR PDF</button>
+                <button type="button" id="btn-pdf" class="btn-save btn-pdf" style="display: none;" onclick="generatePDF()"><i class="fa-solid fa-file-pdf"></i> GENERAR COMPROBANTE PDF</button>
                 <button id="btn-del" class="btn-del-danger" onclick="openConfirm()">ELIMINAR REGISTRO</button>
             </div>
         </div>
@@ -189,7 +189,7 @@
     <div id="pdf-template" style="width: 700px; padding: 40px; box-sizing: border-box; background: white; color: black; font-family: 'Roboto', sans-serif;">
         <div style="border-bottom: 3px solid #ef4444; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end;">
             <div>
-                <h1 style="color: #ef4444; margin: 0; font-size: 38px; font-style: italic; font-weight: 900; letter-spacing: -1px;">RED<span style="color: #000;">SOS</span></h1>
+                <h1 style="color: #ef4444; margin: 0; font-size: 38px; font-weight: 900; letter-spacing: -1px;">RED<span style="color: #000;">SOS</span></h1>
                 <p style="margin: 5px 0 0 0; font-size: 13px; color: #555; font-weight: bold;">Servicio de Auxilio Mecánico y Remolques</p>
             </div>
             <div style="text-align: right;">
@@ -199,7 +199,7 @@
         </div>
         <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
             <div style="background: #f4f4f5; padding: 15px 20px; border-radius: 10px; width: 48%; box-sizing: border-box;">
-                <p style="margin: 0 0 5px 0; font-size: 12px; color: #71717a; font-weight: bold;">FECHA DEL SERVICIO</p>
+                <p style="margin: 0 0 5px 0; font-size: 12px; color: #71717a; font-weight: bold;">FECHA</p>
                 <p style="margin: 0; font-size: 18px; font-weight: 900;" id="pdf-fecha"></p>
             </div>
             <div style="background: #f4f4f5; padding: 15px 20px; border-radius: 10px; width: 48%; text-align: right; box-sizing: border-box;">
@@ -207,16 +207,16 @@
                 <p style="margin: 0; font-size: 18px; font-weight: 900;" id="pdf-estado"></p>
             </div>
         </div>
-        <h3 style="color: #ef4444; border-bottom: 1px solid #e4e4e7; padding-bottom: 10px; font-size: 15px;">DATOS DEL VEHÍCULO Y SERVICIO</h3>
+        <h3 style="color: #ef4444; border-bottom: 1px solid #e4e4e7; padding-bottom: 10px; font-size: 15px;">DETALLES</h3>
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px; font-size: 14px;">
             <tr><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a; font-weight: bold; width: 30%;">Vehículo:</td><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; font-weight: 900;" id="pdf-vehiculo"></td></tr>
-            <tr><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a; font-weight: bold;">Dominio (Patente):</td><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; font-weight: 900;" id="pdf-patente"></td></tr>
+            <tr><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a; font-weight: bold;">Patente:</td><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; font-weight: 900;" id="pdf-patente"></td></tr>
             <tr><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a; font-weight: bold;">Kilómetros:</td><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; font-weight: 900;" id="pdf-km"></td></tr>
-            <tr><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a; font-weight: bold; vertical-align: top;">Motivo / Detalle:</td><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; font-weight: 900;" id="pdf-motivo"></td></tr>
+            <tr><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a; font-weight: bold;">Motivo:</td><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; font-weight: 900;" id="pdf-motivo"></td></tr>
         </table>
         <div style="display: flex; justify-content: flex-end;">
             <div style="background: #111; color: white; padding: 20px 30px; border-radius: 12px; width: 300px; text-align: right; box-sizing: border-box;">
-                <p style="margin: 0 0 5px 0; font-size: 13px; color: #a1a1aa;">TOTAL A ABONAR</p>
+                <p style="margin: 0 0 5px 0; font-size: 13px; color: #a1a1aa;">TOTAL</p>
                 <p style="margin: 0; font-size: 28px; font-weight: 900; letter-spacing: -1px;" id="pdf-monto"></p>
             </div>
         </div>
@@ -244,14 +244,13 @@
     #auth-btn.logged-in { border-color: var(--green); color: var(--green); }
     #menu-btn { background: transparent; border: none; color: #fff; font-size: 20px; padding: 5px; cursor: pointer; }
     
-    /* MODAL OFFLINE */
-    #offline-banner { background: var(--amber); color: #000; text-align: center; padding: 8px; font-size: 11px; font-weight: 900; display: none; align-items: center; justify-content: center; gap: 8px; letter-spacing: 0.5px; z-index: 50; }
+    /* BANNER OFFLINE */
+    #offline-banner { background: var(--amber); color: #000; text-align: center; padding: 8px; font-size: 11px; font-weight: 900; display: none; align-items: center; justify-content: center; gap: 8px; }
     #offline-banner.active { display: flex; }
 
     .dropdown-menu { position: absolute; top: 85px; right: 20px; background: var(--card); border: 1px solid var(--border); border-radius: 15px; padding: 10px; display: none; flex-direction: column; gap: 5px; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.9); }
     .dropdown-menu.active { display: flex; }
-    .dropdown-menu button { background: transparent; border: none; color: #fff; padding: 12px 15px; text-align: left; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 12px; border-radius: 8px; cursor: pointer; }
-    .dropdown-menu button:hover { background: var(--input); }
+    .dropdown-menu button { background: transparent; border: none; color: #fff; padding: 12px 15px; text-align: left; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 12px; border-radius: 8px; }
 
     .search-container { padding: 10px 20px; }
     .search-box { background: var(--input); border: 1px solid var(--border); border-radius: 15px; padding: 12px 15px; display: flex; align-items: center; gap: 10px; }
@@ -266,9 +265,9 @@
 
     .controls-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 20px 10px; gap: 10px; }
     .month-nav { flex: 1; background: var(--input); border: 1px solid var(--border); border-radius: 14px; display: flex; justify-content: space-between; align-items: center; padding: 5px; }
-    .month-nav button { background: transparent; border: none; color: var(--gray); padding: 10px; font-size: 16px; cursor: pointer; }
+    .month-nav button { background: transparent; border: none; color: var(--gray); padding: 10px; font-size: 16px; }
     #current-month-display { font-size: 13px; font-weight: 900; color: #fff; text-align: center; flex: 1; cursor: pointer; }
-    .btn-filter { background: #fff; border: none; color: #000; padding: 0 18px; height: 42px; border-radius: 14px; font-weight: 900; font-size: 12px; display: flex; align-items: center; gap: 8px; }
+    .btn-filter { background: #fff; border: none; color: #000; padding: 0 18px; height: 42px; border-radius: 14px; font-weight: 900; font-size: 12px; }
 
     main { flex: 1; overflow-y: auto; padding: 5px 20px 180px; }
     .card { background: var(--card); border-radius: 16px; border: 1px solid var(--border); margin-bottom: 12px; display: flex; overflow: hidden; cursor: pointer; }
@@ -288,25 +287,18 @@
     .modal-overlay.active { opacity: 1; pointer-events: auto; }
     .bottom-sheet { width: 100%; height: 92%; background: var(--bg); border-radius: 30px 30px 0 0; transform: translateY(100%); transition: 0.4s; padding: 25px; border-top: 1px solid var(--border); overflow-y: auto; }
     .modal-overlay.active .bottom-sheet { transform: translateY(0); }
-    .sheet-header { display: flex; align-items: center; margin-bottom: 25px; }
-    .btn-close { background: var(--input); border: none; color: #fff; width: 45px; height: 45px; border-radius: 14px; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 18px; }
-    .sheet-title { flex: 1; text-align: center; font-weight: 900; font-size: 18px; color: var(--red); margin-right: 45px; }
+    .btn-close { background: var(--input); border: none; color: #fff; width: 45px; height: 45px; border-radius: 14px; }
     
-    .input-group label { display: block; color: var(--gray); font-size: 10px; font-weight: 900; margin-bottom: 5px; text-transform: uppercase; }
+    .input-group label { display: block; color: var(--gray); font-size: 10px; font-weight: 900; margin-bottom: 5px; }
     .input-group input, .input-group select { width: 100%; background: var(--input); border: 1px solid var(--border); color: #fff; padding: 14px; border-radius: 12px; outline: none; font-size: 16px; margin-bottom: 15px; font-weight: 700; }
     .toggle-row { display: flex; justify-content: space-between; align-items: center; background: var(--input); padding: 14px 20px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border); }
-    .toggle-btn { padding: 8px 15px; border-radius: 8px; border: none; font-weight: 900; cursor: pointer; transition: 0.3s; }
+    .toggle-btn { padding: 8px 15px; border-radius: 8px; border: none; font-weight: 900; }
     .toggle-btn.no { background: var(--red); color: #fff; }
     .toggle-btn.si { background: var(--green); color: #fff; }
-    .btn-save { width: 100%; background: var(--red); color: #fff; border: none; padding: 20px; border-radius: 12px; font-size: 16px; font-weight: 900; margin-top: 10px; cursor: pointer; }
-    .btn-cancel { background: transparent; color: var(--gray); border: 1px solid var(--border); cursor: pointer; }
+    .btn-save { width: 100%; background: var(--red); color: #fff; border: none; padding: 20px; border-radius: 12px; font-size: 16px; font-weight: 900; margin-top: 10px; }
+    .btn-pdf { background: var(--amber); color: #000; margin-top: 10px; }
+    .btn-cancel { background: transparent; color: var(--gray); border: 1px solid var(--border); }
     .btn-del-danger { width: 100%; background: transparent; color: var(--red); border: 1px solid var(--red); padding: 15px; border-radius: 12px; margin-top: 15px; font-weight: bold; text-align: center; }
-
-    #modal-confirm { align-items: center; justify-content: center; }
-    .confirm-box { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 30px; width: 85%; max-width: 350px; text-align: center; transform: scale(0.9); opacity: 0; transition: 0.3s; }
-    #modal-confirm.active .confirm-box { transform: scale(1); opacity: 1; }
-    .confirm-actions { display: flex; gap: 15px; margin-top: 20px; }
-    .confirm-actions button { flex: 1; padding: 16px; border-radius: 14px; font-weight: 900; border: none; cursor: pointer; }
 
     #loading-overlay { position: fixed; inset: 0; background: #000; display: none; z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
     .loader { border: 4px solid var(--card); border-top: 4px solid var(--red); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
@@ -332,13 +324,19 @@
     let myChartBilling = null, myChartStatus = null;
 
     window.onload = function() {
-        // Cargar datos locales de respaldo inmediatamente (Modo Offline)
+        // 1. CARGAR CACHE INMEDIATAMENTE
         const localData = localStorage.getItem('red_sos_cache');
         if(localData) { records = JSON.parse(localData); render(); }
 
+        // 2. FORZAR CHEQUEO DE RED
+        updateNetworkStatus();
+
+        // 3. INICIAR GOOGLE
         gapi.load('client', async () => {
-            await gapi.client.init({apiKey: API_KEY, discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']});
-            gapiInited = true; checkReady();
+            try {
+                await gapi.client.init({apiKey: API_KEY, discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']});
+                gapiInited = true; checkReady();
+            } catch(e) { console.warn("Google Offline Mode"); }
         });
         tokenClient = google.accounts.oauth2.initTokenClient({
             client_id: CLIENT_ID, scope: 'https://www.googleapis.com/auth/drive.file', callback: ''
@@ -346,16 +344,23 @@
         gisInited = true; checkReady();
     };
 
-    // DETECTOR DE INTERNET
-    window.addEventListener('online', () => { document.getElementById('offline-banner').classList.remove('active'); syncData(); });
-    window.addEventListener('offline', () => { document.getElementById('offline-banner').classList.add('active'); });
-    if(!navigator.onLine) document.getElementById('offline-banner').classList.add('active');
+    function updateNetworkStatus() {
+        const banner = document.getElementById('offline-banner');
+        if(navigator.onLine) { banner.classList.remove('active'); } 
+        else { banner.classList.add('active'); }
+    }
+
+    window.addEventListener('online', () => { updateNetworkStatus(); syncData(); });
+    window.addEventListener('offline', () => { updateNetworkStatus(); });
 
     function checkReady() { if(gapiInited && gisInited) { updateAuthUI(false); checkAuth(); } }
     async function checkAuth() {
         const token = localStorage.getItem('g_token');
-        if(token) { gapi.client.setToken({access_token: token}); updateAuthUI(true); syncData(); fetchUserInfo(); } 
-        else { render(); }
+        if(token) { 
+            gapi.client.setToken({access_token: token}); 
+            updateAuthUI(true); 
+            if(navigator.onLine) { syncData(); fetchUserInfo(); }
+        } else { render(); }
     }
 
     async function fetchUserInfo() {
@@ -389,8 +394,10 @@
             if(res.result.files && res.result.files.length > 0) {
                 driveFileId = res.result.files[0].id;
                 const content = await gapi.client.drive.files.get({ fileId: driveFileId, alt: 'media' });
-                records = Array.isArray(content.result) ? content.result : [];
-                localStorage.setItem('red_sos_cache', JSON.stringify(records));
+                if (Array.isArray(content.result)) {
+                    records = content.result;
+                    localStorage.setItem('red_sos_cache', JSON.stringify(records));
+                }
             } else {
                 const meta = { name: DB_NAME, mimeType: 'application/json' };
                 const file = await gapi.client.drive.files.create({ resource: meta, fields: 'id' });
@@ -402,7 +409,6 @@
     }
 
     async function saveToDrive() {
-        // Guardar siempre en local primero (Offline)
         localStorage.setItem('red_sos_cache', JSON.stringify(records));
         if(!driveFileId || !gapi.client.getToken() || !navigator.onLine) return;
         try {

@@ -26,7 +26,7 @@
             <div id="user-name-display"></div>
             <div class="header-actions-row">
                 <button id="auth-btn" onclick="handleAuthClick()">
-                    <i class="fa-brands fa-google"></i> <span id="auth-text">...</span>
+                    <i class="fa-brands fa-google"></i> <span id="auth-text">INICIAR SESIÓN</span>
                 </button>
                 <button id="menu-btn" onclick="toggleMenu()">
                     <i class="fa-solid fa-ellipsis-vertical"></i>
@@ -44,7 +44,7 @@
     </header>
 
     <div id="offline-banner">
-        <i class="fa-solid fa-wifi-slash"></i> SIN CONEXIÓN: Usando datos del equipo
+        <i class="fa-solid fa-wifi-slash"></i> SIN CONEXIÓN: Usando memoria del equipo
     </div>
 
     <div class="search-container">
@@ -89,7 +89,7 @@
     </footer>
 
     <div class="modal-overlay" id="modal-filtros">
-        <div class="bottom-sheet" style="height: auto; min-height: 40%;">
+        <div class="bottom-sheet" style="height: auto;">
             <div class="sheet-header">
                 <button class="btn-close" onclick="closeFilters()"><i class="fa-solid fa-xmark"></i></button>
                 <div class="sheet-title">ORDENAR Y FILTRAR</div>
@@ -104,13 +104,15 @@
                     <button class="btn-cancel" style="flex: 1; padding: 12px; border-radius: 12px;" onclick="clearDateRange()">LIMPIAR</button>
                     <button class="btn-save" style="flex: 1; margin-top: 0; padding: 12px; border-radius: 12px;" onclick="applyDateRange()">APLICAR</button>
                 </div>
+                
                 <label class="filter-label">ORDENAR POR:</label>
                 <div class="scroll-bar" style="margin-bottom: 25px;">
                     <div class="chip chip-sort active" id="sort-FECHA" onclick="setSort('FECHA')">FECHA ↓</div>
                     <div class="chip chip-sort" id="sort-MONTO" onclick="setSort('MONTO')">MONTO</div>
                     <div class="chip chip-sort" id="sort-SERVICIO" onclick="setSort('SERVICIO')">N°</div>
                 </div>
-                <label class="filter-label">VER ESTADO:</label>
+                
+                <label class="filter-label">ESTADO DEL SERVICIO:</label>
                 <div class="scroll-bar">
                     <div class="chip chip-filter active" id="f-Todos" onclick="setFilter('Todos')">Todos <span class="badge" id="c-Todos">0</span></div>
                     <div class="chip chip-filter" id="f-Pendiente" onclick="setFilter('Pendiente')">Pend. <span class="badge" id="c-Pendiente">0</span></div>
@@ -131,8 +133,14 @@
                     <div class="metric-mini"><span class="m-label">TICKET PROMEDIO</span><span class="m-value" id="dash-promedio">$0</span></div>
                     <div class="metric-mini"><span class="m-label">TOP VEHÍCULO</span><span class="m-value" id="dash-top-v">-</span></div>
                 </div>
-                <div class="chart-box"><h3>FACTURACIÓN MENSUAL</h3><canvas id="chart-billing"></canvas></div>
-                <div class="chart-box"><h3>ESTADO DE COBROS</h3><canvas id="chart-status"></canvas></div>
+                <div class="chart-box">
+                    <h3>FACTURACIÓN MENSUAL</h3>
+                    <div class="chart-container"><canvas id="chart-billing"></canvas></div>
+                </div>
+                <div class="chart-box">
+                    <h3>ESTADO DE COBROS</h3>
+                    <div class="chart-container"><canvas id="chart-status"></canvas></div>
+                </div>
             </div>
         </div>
     </div>
@@ -152,34 +160,35 @@
                 </div>
                 <div class="row-inputs">
                     <div class="input-group"><label>PATENTE</label><input type="text" id="f-patente"></div>
-                    <div class="input-group"><label>KM</label><input type="number" id="f-km" placeholder="0"></div>
+                    <div class="input-group"><label>KM RECORRIDOS</label><input type="number" id="f-km" placeholder="0"></div>
                 </div>
-                <div class="input-group"><label>VEHÍCULO</label><input type="text" id="f-vehiculo"></div>
+                <div class="input-group"><label>VEHÍCULO (MARCA / MODELO)</label><input type="text" id="f-vehiculo"></div>
                 <div class="input-group"><label>MOTIVO / DETALLE</label><input type="text" id="f-motivo"></div>
                 <div class="input-group">
-                    <label>ESTADO</label>
+                    <label>ESTADO DEL AUXILIO</label>
                     <select id="f-estado">
                         <option value="Pendiente">PENDIENTE</option>
                         <option value="En Curso">EN CURSO</option>
                         <option value="Terminado">TERMINADO</option>
                     </select>
                 </div>
-                <div class="toggle-row"><span>Conciliado</span><button type="button" id="f-conciliado" class="toggle-btn no" onclick="toggleBtn(this)">NO</button></div>
-                <div class="toggle-row"><span>Cobrado</span><button type="button" id="f-cobrado" class="toggle-btn no" onclick="toggleBtn(this)">NO</button></div>
+                <div class="toggle-row"><span>Conciliado con Central</span><button type="button" id="f-conciliado" class="toggle-btn no" onclick="toggleBtn(this)">NO</button></div>
+                <div class="toggle-row"><span>Cobrado al Cliente</span><button type="button" id="f-cobrado" class="toggle-btn no" onclick="toggleBtn(this)">NO</button></div>
                 
                 <button class="btn-save" onclick="saveRecord()">✓ GUARDAR CAMBIOS</button>
                 <button type="button" id="btn-pdf" class="btn-save btn-pdf" style="display: none;" onclick="generatePDF()"><i class="fa-solid fa-file-pdf"></i> GENERAR COMPROBANTE PDF</button>
-                <button id="btn-del" class="btn-del-danger" onclick="openConfirm()">ELIMINAR REGISTRO</button>
+                <button type="button" id="btn-del" class="btn-del-danger" style="display: none;" onclick="openConfirm()">ELIMINAR REGISTRO</button>
             </div>
         </div>
     </div>
 
-    <div class="modal-overlay" id="modal-confirm">
+    <div class="modal-overlay modal-super" id="modal-confirm">
         <div class="confirm-box">
-            <h3>¿ELIMINAR?</h3>
+            <h3>¿ELIMINAR REGISTRO?</h3>
+            <p>Se borrará permanentemente de tu base de datos de Red SOS.</p>
             <div class="confirm-actions">
-                <button class="btn-cancel" onclick="closeConfirm()">NO</button>
-                <button class="btn-confirm-del" onclick="confirmDelete()">SÍ</button>
+                <button class="btn-cancel" onclick="closeConfirm()">CANCELAR</button>
+                <button class="btn-confirm-del" onclick="confirmDelete()">ELIMINAR</button>
             </div>
         </div>
     </div>
@@ -189,12 +198,12 @@
     <div id="pdf-template" style="width: 700px; padding: 40px; box-sizing: border-box; background: white; color: black; font-family: 'Roboto', sans-serif;">
         <div style="border-bottom: 3px solid #ef4444; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end;">
             <div>
-                <h1 style="color: #ef4444; margin: 0; font-size: 38px; font-weight: 900; letter-spacing: -1px;">RED<span style="color: #000;">SOS</span></h1>
+                <h1 style="color: #ef4444; margin: 0; font-size: 38px; font-weight: 900; letter-spacing: -1px; font-style: italic;">RED<span style="color: #000;">SOS</span></h1>
                 <p style="margin: 5px 0 0 0; font-size: 13px; color: #555; font-weight: bold;">Servicio de Auxilio Mecánico y Remolques</p>
             </div>
             <div style="text-align: right;">
                 <h2 style="margin: 0; color: #111; font-size: 24px; font-weight: 900;">COMPROBANTE</h2>
-                <p style="margin: 5px 0 0 0; font-size: 16px; color: #555;">Servicio N° <span id="pdf-nro" style="font-weight: bold; color: #000;"></span></p>
+                <p style="margin: 5px 0 0 0; font-size: 15px; color: #555;">Servicio N° <span id="pdf-nro" style="font-weight: bold; color: #000;"></span></p>
             </div>
         </div>
         <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
@@ -207,16 +216,16 @@
                 <p style="margin: 0; font-size: 18px; font-weight: 900;" id="pdf-estado"></p>
             </div>
         </div>
-        <h3 style="color: #ef4444; border-bottom: 1px solid #e4e4e7; padding-bottom: 10px; font-size: 15px;">DETALLES</h3>
+        <h3 style="color: #ef4444; border-bottom: 1px solid #e4e4e7; padding-bottom: 10px; font-size: 15px;">DETALLES DEL SERVICIO</h3>
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px; font-size: 14px;">
             <tr><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a; font-weight: bold; width: 30%;">Vehículo:</td><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; font-weight: 900;" id="pdf-vehiculo"></td></tr>
-            <tr><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a; font-weight: bold;">Patente:</td><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; font-weight: 900;" id="pdf-patente"></td></tr>
+            <tr><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a; font-weight: bold;">Dominio (Patente):</td><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; font-weight: 900;" id="pdf-patente"></td></tr>
             <tr><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a; font-weight: bold;">Kilómetros:</td><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; font-weight: 900;" id="pdf-km"></td></tr>
-            <tr><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a; font-weight: bold;">Motivo:</td><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; font-weight: 900;" id="pdf-motivo"></td></tr>
+            <tr><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; color: #71717a; font-weight: bold;">Motivo / Detalle:</td><td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; font-weight: 900;" id="pdf-motivo"></td></tr>
         </table>
         <div style="display: flex; justify-content: flex-end;">
             <div style="background: #111; color: white; padding: 20px 30px; border-radius: 12px; width: 300px; text-align: right; box-sizing: border-box;">
-                <p style="margin: 0 0 5px 0; font-size: 13px; color: #a1a1aa;">TOTAL</p>
+                <p style="margin: 0 0 5px 0; font-size: 13px; color: #a1a1aa;">TOTAL A ABONAR</p>
                 <p style="margin: 0; font-size: 28px; font-weight: 900; letter-spacing: -1px;" id="pdf-monto"></p>
             </div>
         </div>
@@ -232,7 +241,7 @@
     body { background: var(--bg); color: #fff; height: 100dvh; overflow: hidden; display: flex; justify-content: center; }
     #app-container { width: 100%; max-width: 500px; height: 100%; display: flex; flex-direction: column; position: relative; }
 
-    header { padding: 30px 20px 10px; display: flex; justify-content: space-between; align-items: center; position: relative; }
+    header { padding: 30px 20px 10px; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 10; }
     .logo { color: #fff; font-size: 28px; font-weight: 900; letter-spacing: -1px; }
     .logo span { color: var(--red); }
     
@@ -244,13 +253,13 @@
     #auth-btn.logged-in { border-color: var(--green); color: var(--green); }
     #menu-btn { background: transparent; border: none; color: #fff; font-size: 20px; padding: 5px; cursor: pointer; }
     
-    /* BANNER OFFLINE */
-    #offline-banner { background: var(--amber); color: #000; text-align: center; padding: 8px; font-size: 11px; font-weight: 900; display: none; align-items: center; justify-content: center; gap: 8px; }
+    #offline-banner { background: var(--amber); color: #000; text-align: center; padding: 8px; font-size: 11px; font-weight: 900; display: none; align-items: center; justify-content: center; gap: 8px; z-index: 5; }
     #offline-banner.active { display: flex; }
 
     .dropdown-menu { position: absolute; top: 85px; right: 20px; background: var(--card); border: 1px solid var(--border); border-radius: 15px; padding: 10px; display: none; flex-direction: column; gap: 5px; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.9); }
     .dropdown-menu.active { display: flex; }
-    .dropdown-menu button { background: transparent; border: none; color: #fff; padding: 12px 15px; text-align: left; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 12px; border-radius: 8px; }
+    .dropdown-menu button { background: transparent; border: none; color: #fff; padding: 12px 15px; text-align: left; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 12px; border-radius: 8px; cursor: pointer; }
+    .dropdown-menu button:hover { background: var(--input); }
 
     .search-container { padding: 10px 20px; }
     .search-box { background: var(--input); border: 1px solid var(--border); border-radius: 15px; padding: 12px 15px; display: flex; align-items: center; gap: 10px; }
@@ -265,12 +274,12 @@
 
     .controls-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 20px 10px; gap: 10px; }
     .month-nav { flex: 1; background: var(--input); border: 1px solid var(--border); border-radius: 14px; display: flex; justify-content: space-between; align-items: center; padding: 5px; }
-    .month-nav button { background: transparent; border: none; color: var(--gray); padding: 10px; font-size: 16px; }
+    .month-nav button { background: transparent; border: none; color: var(--gray); padding: 10px; font-size: 16px; cursor: pointer; }
     #current-month-display { font-size: 13px; font-weight: 900; color: #fff; text-align: center; flex: 1; cursor: pointer; }
-    .btn-filter { background: #fff; border: none; color: #000; padding: 0 18px; height: 42px; border-radius: 14px; font-weight: 900; font-size: 12px; }
+    .btn-filter { background: #fff; border: none; color: #000; padding: 0 18px; height: 42px; border-radius: 14px; font-weight: 900; font-size: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
 
     main { flex: 1; overflow-y: auto; padding: 5px 20px 180px; }
-    .card { background: var(--card); border-radius: 16px; border: 1px solid var(--border); margin-bottom: 12px; display: flex; overflow: hidden; cursor: pointer; }
+    .card { background: var(--card); border-radius: 16px; border: 1px solid var(--border); margin-bottom: 12px; display: flex; overflow: hidden; cursor: pointer; transition: 0.2s; }
     .card-accent { width: 6px; }
     .card-body { padding: 18px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
     .card-top { display: flex; justify-content: space-between; align-items: center; }
@@ -283,22 +292,52 @@
     .total-amount { font-size: 32px; font-weight: 900; letter-spacing: -1px; }
     .fab { background: var(--red); width: 65px; height: 65px; border-radius: 20px; border: none; color: #fff; font-size: 28px; box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4); cursor: pointer; }
 
+    /* MODALES CONFIGURACIÓN */
     .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; display: flex; align-items: flex-end; }
     .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    
+    /* MODAL DE ELIMINAR (Debe estar por encima del formulario) */
+    .modal-super { z-index: 2000 !important; align-items: center; justify-content: center; }
+
     .bottom-sheet { width: 100%; height: 92%; background: var(--bg); border-radius: 30px 30px 0 0; transform: translateY(100%); transition: 0.4s; padding: 25px; border-top: 1px solid var(--border); overflow-y: auto; }
     .modal-overlay.active .bottom-sheet { transform: translateY(0); }
-    .btn-close { background: var(--input); border: none; color: #fff; width: 45px; height: 45px; border-radius: 14px; }
-    
-    .input-group label { display: block; color: var(--gray); font-size: 10px; font-weight: 900; margin-bottom: 5px; }
+    .sheet-header { display: flex; align-items: center; margin-bottom: 25px; }
+    .btn-close { background: var(--input); border: none; color: #fff; width: 45px; height: 45px; border-radius: 14px; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 18px; }
+    .sheet-title { flex: 1; text-align: center; font-weight: 900; font-size: 18px; color: var(--red); margin-right: 45px; }
+    .full-height { height: 95% !important; }
+
+    /* DASHBOARD Y GRÁFICOS (Corrección de tamaño) */
+    .analytics-grid { display: flex; gap: 10px; margin-bottom: 20px; }
+    .metric-mini { flex: 1; background: var(--input); padding: 15px; border-radius: 15px; border: 1px solid var(--border); }
+    .m-label { display: block; color: var(--gray); font-size: 8px; font-weight: 900; margin-bottom: 4px; }
+    .m-value { font-size: 14px; font-weight: 900; color: #fff; }
+    .chart-box { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+    .chart-box h3 { font-size: 12px; color: var(--gray); margin-bottom: 15px; font-weight: 900; text-align: center; }
+    .chart-container { position: relative; height: 200px; width: 100%; } /* Fundamental para que Chart.js no se rompa */
+
+    .row-inputs { display: flex; gap: 10px; }
+    .input-group { flex: 1; }
+    .input-group label { display: block; color: var(--gray); font-size: 10px; font-weight: 900; margin-bottom: 5px; text-transform: uppercase; }
     .input-group input, .input-group select { width: 100%; background: var(--input); border: 1px solid var(--border); color: #fff; padding: 14px; border-radius: 12px; outline: none; font-size: 16px; margin-bottom: 15px; font-weight: 700; }
     .toggle-row { display: flex; justify-content: space-between; align-items: center; background: var(--input); padding: 14px 20px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border); }
-    .toggle-btn { padding: 8px 15px; border-radius: 8px; border: none; font-weight: 900; }
+    .toggle-row span { font-weight: 700; font-size: 14px; }
+    .toggle-btn { padding: 8px 15px; border-radius: 8px; border: none; font-weight: 900; cursor: pointer; transition: 0.3s; }
     .toggle-btn.no { background: var(--red); color: #fff; }
     .toggle-btn.si { background: var(--green); color: #fff; }
-    .btn-save { width: 100%; background: var(--red); color: #fff; border: none; padding: 20px; border-radius: 12px; font-size: 16px; font-weight: 900; margin-top: 10px; }
+    
+    .btn-save { width: 100%; background: var(--red); color: #fff; border: none; padding: 20px; border-radius: 12px; font-size: 16px; font-weight: 900; margin-top: 10px; cursor: pointer; }
     .btn-pdf { background: var(--amber); color: #000; margin-top: 10px; }
-    .btn-cancel { background: transparent; color: var(--gray); border: 1px solid var(--border); }
-    .btn-del-danger { width: 100%; background: transparent; color: var(--red); border: 1px solid var(--red); padding: 15px; border-radius: 12px; margin-top: 15px; font-weight: bold; text-align: center; }
+    .btn-cancel { background: transparent; color: var(--gray); border: 1px solid var(--border); cursor: pointer; }
+    .btn-del-danger { width: 100%; background: transparent; color: var(--red); border: 1px solid var(--red); padding: 15px; border-radius: 12px; margin-top: 15px; font-weight: bold; cursor: pointer; text-align: center; }
+
+    /* CARTEL CONFIRMAR */
+    .confirm-box { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 30px; width: 85%; max-width: 350px; text-align: center; transform: scale(0.9); opacity: 0; transition: 0.3s; }
+    #modal-confirm.active .confirm-box { transform: scale(1); opacity: 1; }
+    .confirm-box h3 { color: var(--red); font-size: 20px; font-weight: 900; margin-bottom: 10px; }
+    .confirm-box p { color: var(--gray); font-size: 13px; margin-bottom: 25px; line-height: 1.5; }
+    .confirm-actions { display: flex; gap: 15px; }
+    .confirm-actions button { flex: 1; padding: 16px; border-radius: 14px; font-weight: 900; font-size: 14px; border: none; cursor: pointer; }
+    .btn-confirm-del { background: var(--red); color: #fff; }
 
     #loading-overlay { position: fixed; inset: 0; background: #000; display: none; z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
     .loader { border: 4px solid var(--card); border-top: 4px solid var(--red); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
@@ -306,6 +345,7 @@
 
     .filter-label { display: block; color: var(--gray); font-size: 10px; font-weight: 900; margin-bottom: 8px; letter-spacing: 1px; }
     .scroll-bar { display: flex; overflow-x: auto; gap: 8px; scrollbar-width: none; }
+    .scroll-bar::-webkit-scrollbar { display: none; }
     .chip { padding: 12px 18px; border-radius: 14px; font-size: 12px; font-weight: bold; background: var(--card); border: 1px solid var(--border); color: var(--gray); white-space: nowrap; cursor: pointer; }
     .chip.active { background: var(--red); color: #fff; border-color: var(--red); }
     .chip-sort.active { background: #fff; color: #000; border-color: #fff; }
@@ -323,25 +363,28 @@
     let dateFrom = '', dateTo = '';
     let myChartBilling = null, myChartStatus = null;
 
+    // INICIO Y DETECCIÓN OFFLINE
     window.onload = function() {
-        // 1. CARGAR CACHE INMEDIATAMENTE
         const localData = localStorage.getItem('red_sos_cache');
-        if(localData) { records = JSON.parse(localData); render(); }
+        if(localData) { 
+            records = JSON.parse(localData); 
+            render(); 
+        }
 
-        // 2. FORZAR CHEQUEO DE RED
         updateNetworkStatus();
 
-        // 3. INICIAR GOOGLE
-        gapi.load('client', async () => {
-            try {
-                await gapi.client.init({apiKey: API_KEY, discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']});
-                gapiInited = true; checkReady();
-            } catch(e) { console.warn("Google Offline Mode"); }
-        });
-        tokenClient = google.accounts.oauth2.initTokenClient({
-            client_id: CLIENT_ID, scope: 'https://www.googleapis.com/auth/drive.file', callback: ''
-        });
-        gisInited = true; checkReady();
+        try {
+            gapi.load('client', async () => {
+                try {
+                    await gapi.client.init({apiKey: API_KEY, discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']});
+                    gapiInited = true; checkReady();
+                } catch(e) { console.warn("Google offline"); }
+            });
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID, scope: 'https://www.googleapis.com/auth/drive.file', callback: ''
+            });
+            gisInited = true; checkReady();
+        } catch(err) { console.error(err); }
     };
 
     function updateNetworkStatus() {
@@ -354,38 +397,55 @@
     window.addEventListener('offline', () => { updateNetworkStatus(); });
 
     function checkReady() { if(gapiInited && gisInited) { updateAuthUI(false); checkAuth(); } }
+    
     async function checkAuth() {
         const token = localStorage.getItem('g_token');
         if(token) { 
             gapi.client.setToken({access_token: token}); 
             updateAuthUI(true); 
             if(navigator.onLine) { syncData(); fetchUserInfo(); }
-        } else { render(); }
+        } else { 
+            render(); 
+        }
     }
 
     async function fetchUserInfo() {
         try {
             const res = await gapi.client.drive.about.get({ fields: 'user' });
-            if (res.result && res.result.user) document.getElementById('user-name-display').innerText = 'SESIÓN: ' + res.result.user.displayName.toUpperCase();
+            if (res.result && res.result.user) {
+                document.getElementById('user-name-display').innerText = 'SESIÓN: ' + res.result.user.displayName.toUpperCase();
+            }
         } catch (e) {}
     }
 
     function updateAuthUI(logged) { 
         const btn = document.getElementById('auth-btn');
         const textSpan = document.getElementById('auth-text');
-        if(logged) { btn.classList.add('logged-in'); textSpan.innerText = 'CERRAR SESIÓN'; } 
-        else { btn.classList.remove('logged-in'); textSpan.innerText = 'INICIAR SESIÓN'; document.getElementById('user-name-display').innerText = ''; }
+        if(logged) { 
+            btn.classList.add('logged-in'); 
+            textSpan.innerText = 'CERRAR SESIÓN'; 
+        } else { 
+            btn.classList.remove('logged-in'); 
+            textSpan.innerText = 'INICIAR SESIÓN'; 
+            document.getElementById('user-name-display').innerText = ''; 
+        }
     }
 
     function handleAuthClick() {
         const token = localStorage.getItem('g_token');
-        if (token) { localStorage.removeItem('g_token'); gapi.client.setToken(null); records = []; driveFileId = null; updateAuthUI(false); render(); } 
-        else {
-            tokenClient.callback = async (r) => { if(r.error) return; localStorage.setItem('g_token', r.access_token); updateAuthUI(true); syncData(); fetchUserInfo(); };
+        if (token) { 
+            localStorage.removeItem('g_token'); gapi.client.setToken(null); records = []; driveFileId = null; updateAuthUI(false); render(); 
+        } else {
+            tokenClient.callback = async (r) => { 
+                if(r.error) return; 
+                localStorage.setItem('g_token', r.access_token); 
+                updateAuthUI(true); syncData(); fetchUserInfo(); 
+            };
             tokenClient.requestAccessToken({prompt: gapi.client.getToken() ? '' : 'consent'});
         }
     }
 
+    // SINCRONIZACIÓN Y GUARDADO
     async function syncData() {
         if(!navigator.onLine) return;
         document.getElementById('loading-overlay').style.display = 'flex';
@@ -419,45 +479,106 @@
         } catch(e) {}
     }
 
+    // MENÚS Y PANELES
     function toggleMenu() { document.getElementById('main-menu').classList.toggle('active'); }
     window.onclick = function(e) { if (!e.target.matches('#menu-btn') && !e.target.matches('#menu-btn i')) document.getElementById('main-menu').classList.remove('active'); }
+    
     function openFilters() { document.getElementById('modal-filtros').classList.add('active'); }
     function closeFilters() { document.getElementById('modal-filtros').classList.remove('active'); }
 
     function applyDateRange() {
-        dateFrom = document.getElementById('filter-desde').value; dateTo = document.getElementById('filter-hasta').value;
-        if(!dateFrom || !dateTo) return alert("Seleccioná ambas fechas."); showAll = false; render(); closeFilters();
+        dateFrom = document.getElementById('filter-desde').value; 
+        dateTo = document.getElementById('filter-hasta').value;
+        if(!dateFrom || !dateTo) return alert("Seleccioná ambas fechas."); 
+        showAll = false; render(); closeFilters();
     }
-    function clearDateRange() { dateFrom = ''; dateTo = ''; document.getElementById('filter-desde').value = ''; document.getElementById('filter-hasta').value = ''; render(); }
+    
+    function clearDateRange() { 
+        dateFrom = ''; dateTo = ''; 
+        document.getElementById('filter-desde').value = ''; 
+        document.getElementById('filter-hasta').value = ''; 
+        render(); 
+    }
 
-    function openDashboard() { document.getElementById('modal-dashboard').classList.add('active'); processAnalytics(); }
+    // DASHBOARD Y GRÁFICOS (CORREGIDOS)
+    function openDashboard() { 
+        document.getElementById('modal-dashboard').classList.add('active'); 
+        // Pequeño timeout para asegurar que el modal ya es visible y ChartJS calcule bien el tamaño
+        setTimeout(() => { processAnalytics(); }, 300);
+    }
+    
     function closeDashboard() { document.getElementById('modal-dashboard').classList.remove('active'); }
 
     function processAnalytics() {
         let dataDash = records;
-        if (dateFrom && dateTo) dataDash = dataDash.filter(r => (r.fecha||'') >= dateFrom && (r.fecha||'') <= dateTo);
-        else if (!showAll) dataDash = dataDash.filter(r => (r.fecha||'').startsWith(currentMonth));
-        if (!dataDash.length) return;
+        if (dateFrom && dateTo) {
+            dataDash = dataDash.filter(r => (r.fecha||'') >= dateFrom && (r.fecha||'') <= dateTo);
+        } else if (!showAll) {
+            dataDash = dataDash.filter(r => (r.fecha||'').startsWith(currentMonth));
+        }
+
+        if (!dataDash.length) {
+            document.getElementById('dash-promedio').innerText = '$0';
+            document.getElementById('dash-top-v').innerText = '-';
+            return;
+        }
+
         const totalDinero = dataDash.reduce((s, r) => s + parseFloat(r.monto || 0), 0);
         document.getElementById('dash-promedio').innerText = '$' + (totalDinero / dataDash.length).toLocaleString('es-AR', {maximumFractionDigits:0});
+
         const vehiculos = {};
         dataDash.forEach(r => { if(r.vehiculo) vehiculos[r.vehiculo] = (vehiculos[r.vehiculo] || 0) + 1; });
         const topV = Object.keys(vehiculos).sort((a,b) => vehiculos[b] - vehiculos[a])[0] || "N/A";
         document.getElementById('dash-top-v').innerText = topV.toUpperCase();
+
         const meses = {};
-        records.forEach(r => { if(r.fecha) { const m = r.fecha.substring(0, 7); meses[m] = (meses[m] || 0) + parseFloat(r.monto || 0); } });
+        records.forEach(r => { 
+            if(r.fecha) { 
+                const m = r.fecha.substring(0, 7); 
+                meses[m] = (meses[m] || 0) + parseFloat(r.monto || 0); 
+            } 
+        });
+        
         const labelsMeses = Object.keys(meses).sort().slice(-6);
         const dataMeses = labelsMeses.map(m => meses[m]);
+
         if(myChartBilling) myChartBilling.destroy();
-        myChartBilling = new Chart(document.getElementById('chart-billing'), { type: 'bar', data: { labels: labelsMeses, datasets: [{ label: 'Facturación $', data: dataMeses, backgroundColor: '#f59e0b', borderRadius: 6 }] }, options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#27272a' } } } } });
+        myChartBilling = new Chart(document.getElementById('chart-billing'), { 
+            type: 'bar', 
+            data: { 
+                labels: labelsMeses, 
+                datasets: [{ label: 'Facturación $', data: dataMeses, backgroundColor: '#f59e0b', borderRadius: 6 }] 
+            }, 
+            options: { 
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }, 
+                scales: { y: { beginAtZero: true, grid: { color: '#27272a' } } } 
+            } 
+        });
+
         const cobrados = dataDash.filter(r => r.cobrado === 'SI').length;
         if(myChartStatus) myChartStatus.destroy();
-        myChartStatus = new Chart(document.getElementById('chart-status'), { type: 'doughnut', data: { labels: ['Cobrado', 'Pendiente'], datasets: [{ data: [cobrados, dataDash.length - cobrados], backgroundColor: ['#10b981', '#ef4444'], borderWidth: 0 }] }, options: { cutout: '75%', plugins: { legend: { position: 'bottom', labels: { color: '#a1a1aa', font: { weight: 'bold' } } } } } });
+        myChartStatus = new Chart(document.getElementById('chart-status'), { 
+            type: 'doughnut', 
+            data: { 
+                labels: ['Cobrado', 'Pendiente'], 
+                datasets: [{ data: [cobrados, dataDash.length - cobrados], backgroundColor: ['#10b981', '#ef4444'], borderWidth: 0 }] 
+            }, 
+            options: { 
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%', 
+                plugins: { legend: { position: 'bottom', labels: { color: '#a1a1aa', font: { weight: 'bold' } } } } 
+            } 
+        });
     }
 
+    // RENDER PRINCIPAL DE LA LISTA
     function render() {
         const searchVal = document.getElementById('main-search').value.toLowerCase();
         let data = records;
+
         if (dateFrom && dateTo) {
             data = data.filter(r => (r.fecha||'') >= dateFrom && (r.fecha||'') <= dateTo);
             document.getElementById('current-month-display').innerText = `${dateFrom.split('-').reverse().join('/').substring(0,5)} al ${dateTo.split('-').reverse().join('/').substring(0,5)}`;
@@ -465,23 +586,34 @@
             data = data.filter(r => (r.fecha||'').startsWith(currentMonth));
             document.getElementById('current-month-display').innerText = currentMonth;
         } else {
-            document.getElementById('current-month-display').innerText = "HISTORIAL COMPLETO";
+            document.getElementById('current-month-display').innerText = "HISTORIAL";
         }
-        if(searchVal) data = data.filter(r => (r.patente && r.patente.toLowerCase().includes(searchVal)) || (r.vehiculo && r.vehiculo.toLowerCase().includes(searchVal)) || (r.servicio && r.servicio.toString().includes(searchVal)));
+
+        if(searchVal) {
+            data = data.filter(r => (r.patente && r.patente.toLowerCase().includes(searchVal)) || (r.vehiculo && r.vehiculo.toLowerCase().includes(searchVal)) || (r.servicio && r.servicio.toString().includes(searchVal)));
+        }
+
         const penMonto = data.filter(x => x.cobrado === 'NO').reduce((s,r) => s + parseFloat(r.monto || 0), 0);
         const cobMonto = data.filter(x => x.cobrado === 'SI').reduce((s,r) => s + parseFloat(r.monto || 0), 0);
         document.getElementById('stat-pendiente').innerText = '$' + penMonto.toLocaleString('es-AR');
         document.getElementById('stat-cobrado').innerText = '$' + cobMonto.toLocaleString('es-AR');
+
         document.getElementById('c-Todos').innerText = data.length;
         document.getElementById('c-Pendiente').innerText = data.filter(x => x.estado === 'Pendiente').length;
         document.getElementById('c-Terminado').innerText = data.filter(x => x.estado === 'Terminado').length;
-        if(currentFilter !== 'Todos') data = data.filter(r => r.estado === currentFilter);
+        
+        if(currentFilter !== 'Todos') {
+            data = data.filter(r => r.estado === currentFilter);
+        }
+
         data.sort((a,b) => {
             let res = sortBy === 'FECHA' ? (a.fecha||'').localeCompare(b.fecha||'') : (sortBy === 'MONTO' ? parseFloat(a.monto||0) - parseFloat(b.monto||0) : parseInt(a.servicio||0) - parseInt(b.servicio||0));
             return sortAsc ? res : -res;
         });
+
         const container = document.getElementById('list-container');
         container.innerHTML = data.length ? '' : '<p style="text-align:center; margin-top:50px; color:#3f3f46; font-weight:900; font-size:30px;">SIN DATOS</p>';
+
         data.forEach(r => {
             const color = r.estado === 'Terminado' ? 'var(--green)' : (r.estado === 'En Curso' ? 'var(--amber)' : 'var(--red)');
             const div = document.createElement('div'); div.className = 'card';
@@ -492,43 +624,131 @@
                 </div>`;
             container.appendChild(div);
         });
+
         document.getElementById('total-monto').innerText = '$' + data.reduce((s, r) => s + parseFloat(r.monto || 0), 0).toLocaleString('es-AR', {minimumFractionDigits: 2});
     }
 
     function toggleAllMonths() { showAll = !showAll; clearDateRange(); }
-    function changeMonth(d) { clearDateRange(); let [y, m] = currentMonth.split('-').map(Number); m += d; if(m>12){m=1;y++} else if(m<1){m=12;y--} currentMonth = `${y}-${String(m).padStart(2,'0')}`; showAll = false; render(); }
-    function setFilter(f) { currentFilter = f; document.querySelectorAll('.chip-filter').forEach(c => c.classList.remove('active')); document.getElementById(`f-${f}`).classList.add('active'); render(); closeFilters(); }
-    function setSort(s) { if (sortBy === s) sortAsc = !sortAsc; else { sortBy = s; sortAsc = false; } document.querySelectorAll('.chip-sort').forEach(chip => { chip.classList.remove('active'); let t = chip.innerText.replace(' ↑', '').replace(' ↓', ''); if (chip.id === `sort-${s}`) { chip.classList.add('active'); chip.innerText = t + (sortAsc ? ' ↑' : ' ↓'); } else { chip.innerText = t; } }); render(); closeFilters(); }
+    
+    function changeMonth(d) { 
+        clearDateRange(); 
+        let [y, m] = currentMonth.split('-').map(Number); 
+        m += d; 
+        if(m>12){m=1;y++} else if(m<1){m=12;y--} 
+        currentMonth = `${y}-${String(m).padStart(2,'0')}`; 
+        showAll = false; render(); 
+    }
+    
+    function setFilter(f) { 
+        currentFilter = f; 
+        document.querySelectorAll('.chip-filter').forEach(c => c.classList.remove('active')); 
+        document.getElementById(`f-${f}`).classList.add('active'); 
+        render(); closeFilters(); 
+    }
+    
+    function setSort(s) { 
+        if (sortBy === s) sortAsc = !sortAsc; else { sortBy = s; sortAsc = false; } 
+        document.querySelectorAll('.chip-sort').forEach(chip => { 
+            chip.classList.remove('active'); 
+            let t = chip.innerText.replace(' ↑', '').replace(' ↓', ''); 
+            if (chip.id === `sort-${s}`) { chip.classList.add('active'); chip.innerText = t + (sortAsc ? ' ↑' : ' ↓'); } 
+            else { chip.innerText = t; } 
+        }); 
+        render(); closeFilters(); 
+    }
 
-    function toggleBtn(btn) { btn.innerText = btn.innerText === 'SI' ? 'NO' : 'SI'; btn.className = 'toggle-btn ' + (btn.innerText === 'SI' ? 'si' : 'no'); }
+    // FORMULARIO CRUD Y ELIMINAR (CORREGIDO)
+    function toggleBtn(btn) { 
+        btn.innerText = btn.innerText === 'SI' ? 'NO' : 'SI'; 
+        btn.className = 'toggle-btn ' + (btn.innerText === 'SI' ? 'si' : 'no'); 
+    }
+    
     function openForm(id = null) {
         document.getElementById('btn-del').style.display = id ? 'block' : 'none';
         document.getElementById('btn-pdf').style.display = id ? 'block' : 'none';
+        
         if(id) {
             const r = records.find(x => x.id === id);
-            document.getElementById('f-id').value = r.id; document.getElementById('f-fecha').value = r.fecha; document.getElementById('f-servicio').value = r.servicio; document.getElementById('f-monto').value = r.monto; document.getElementById('f-patente').value = r.patente; document.getElementById('f-vehiculo').value = r.vehiculo || ''; document.getElementById('f-km').value = r.km || ''; document.getElementById('f-motivo').value = r.motivo; document.getElementById('f-estado').value = r.estado;
-            document.getElementById('f-conciliado').innerText = r.conciliado || 'NO'; document.getElementById('f-conciliado').className = 'toggle-btn ' + (r.conciliado === 'SI' ? 'si' : 'no');
-            document.getElementById('f-cobrado').innerText = r.cobrado || 'NO'; document.getElementById('f-cobrado').className = 'toggle-btn ' + (r.cobrado === 'SI' ? 'si' : 'no');
+            document.getElementById('f-id').value = r.id; 
+            document.getElementById('f-fecha').value = r.fecha; 
+            document.getElementById('f-servicio').value = r.servicio; 
+            document.getElementById('f-monto').value = r.monto; 
+            document.getElementById('f-patente').value = r.patente; 
+            document.getElementById('f-vehiculo').value = r.vehiculo || ''; 
+            document.getElementById('f-km').value = r.km || ''; 
+            document.getElementById('f-motivo').value = r.motivo; 
+            document.getElementById('f-estado').value = r.estado;
+            
+            document.getElementById('f-conciliado').innerText = r.conciliado || 'NO'; 
+            document.getElementById('f-conciliado').className = 'toggle-btn ' + (r.conciliado === 'SI' ? 'si' : 'no');
+            
+            document.getElementById('f-cobrado').innerText = r.cobrado || 'NO'; 
+            document.getElementById('f-cobrado').className = 'toggle-btn ' + (r.cobrado === 'SI' ? 'si' : 'no');
         } else {
-            document.getElementById('f-id').value = ''; document.getElementById('f-fecha').value = new Date().toISOString().substring(0,10); document.getElementById('f-servicio').value = ''; document.getElementById('f-monto').value = ''; document.getElementById('f-patente').value = ''; document.getElementById('f-vehiculo').value = ''; document.getElementById('f-km').value = ''; document.getElementById('f-motivo').value = ''; document.getElementById('f-estado').value = 'Pendiente';
-            document.getElementById('f-conciliado').innerText = 'NO'; document.getElementById('f-conciliado').className = 'toggle-btn no'; document.getElementById('f-cobrado').innerText = 'NO'; document.getElementById('f-cobrado').className = 'toggle-btn no';
+            document.getElementById('f-id').value = ''; 
+            document.getElementById('f-fecha').value = new Date().toISOString().substring(0,10); 
+            document.getElementById('f-servicio').value = ''; 
+            document.getElementById('f-monto').value = ''; 
+            document.getElementById('f-patente').value = ''; 
+            document.getElementById('f-vehiculo').value = ''; 
+            document.getElementById('f-km').value = ''; 
+            document.getElementById('f-motivo').value = ''; 
+            document.getElementById('f-estado').value = 'Pendiente';
+            
+            document.getElementById('f-conciliado').innerText = 'NO'; 
+            document.getElementById('f-conciliado').className = 'toggle-btn no'; 
+            document.getElementById('f-cobrado').innerText = 'NO'; 
+            document.getElementById('f-cobrado').className = 'toggle-btn no';
         }
         document.getElementById('modal-form').classList.add('active');
     }
+
     function closeForm() { document.getElementById('modal-form').classList.remove('active'); }
     function openConfirm() { document.getElementById('modal-confirm').classList.add('active'); }
     function closeConfirm() { document.getElementById('modal-confirm').classList.remove('active'); }
     
     async function saveRecord() {
         const id = document.getElementById('f-id').value;
-        const data = { id: id || Math.random().toString(36).substr(2, 9), fecha: document.getElementById('f-fecha').value, servicio: document.getElementById('f-servicio').value || '0', monto: document.getElementById('f-monto').value || 0, patente: document.getElementById('f-patente').value.toUpperCase(), vehiculo: document.getElementById('f-vehiculo').value, km: document.getElementById('f-km').value || 0, motivo: document.getElementById('f-motivo').value, estado: document.getElementById('f-estado').value, conciliado: document.getElementById('f-conciliado').innerText, cobrado: document.getElementById('f-cobrado').innerText };
-        if(id) records = records.map(r => r.id === id ? data : r); else records.push(data);
-        closeForm(); render(); await saveToDrive();
+        const data = { 
+            id: id || Math.random().toString(36).substr(2, 9), 
+            fecha: document.getElementById('f-fecha').value, 
+            servicio: document.getElementById('f-servicio').value || '0', 
+            monto: document.getElementById('f-monto').value || 0, 
+            patente: document.getElementById('f-patente').value.toUpperCase(), 
+            vehiculo: document.getElementById('f-vehiculo').value, 
+            km: document.getElementById('f-km').value || 0, 
+            motivo: document.getElementById('f-motivo').value, 
+            estado: document.getElementById('f-estado').value, 
+            conciliado: document.getElementById('f-conciliado').innerText, 
+            cobrado: document.getElementById('f-cobrado').innerText 
+        };
+        
+        if(id) {
+            records = records.map(r => r.id === id ? data : r); 
+        } else {
+            records.push(data);
+        }
+        
+        closeForm(); 
+        render(); 
+        await saveToDrive();
     }
-    async function confirmDelete() { closeConfirm(); records = records.filter(r => r.id !== document.getElementById('f-id').value); closeForm(); render(); await saveToDrive(); }
 
+    // ELIMINAR CORREGIDO
+    async function confirmDelete() { 
+        closeConfirm(); // Cierra el cartel chico
+        closeForm(); // Cierra el formulario
+        records = records.filter(r => r.id !== document.getElementById('f-id').value); 
+        render(); 
+        await saveToDrive(); 
+    }
+
+    // GENERAR PDF
     function generatePDF() {
+        if(typeof html2pdf === 'undefined') return alert("La librería PDF aún no cargó.");
+        
         document.getElementById('loading-overlay').style.display = 'flex';
+        
         document.getElementById('pdf-nro').innerText = document.getElementById('f-servicio').value || 'S/N';
         document.getElementById('pdf-fecha').innerText = document.getElementById('f-fecha').value.split('-').reverse().join('/');
         document.getElementById('pdf-vehiculo').innerText = document.getElementById('f-vehiculo').value || 'S/D';
@@ -536,25 +756,62 @@
         document.getElementById('pdf-km').innerText = document.getElementById('f-km').value + ' km';
         document.getElementById('pdf-motivo').innerText = document.getElementById('f-motivo').value || 'Asistencia';
         document.getElementById('pdf-monto').innerText = '$' + parseFloat(document.getElementById('f-monto').value || 0).toLocaleString('es-AR', {minimumFractionDigits: 2});
+        
         const est = document.getElementById('f-cobrado').innerText;
         document.getElementById('pdf-estado').innerText = est === 'SI' ? 'PAGADO' : 'PENDIENTE';
         document.getElementById('pdf-estado').style.color = est === 'SI' ? '#10b981' : '#ef4444';
-        html2pdf().set({ margin: 0.5, filename: `RedSOS_${document.getElementById('pdf-nro').innerText}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, windowWidth: 700 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(document.getElementById('pdf-template')).save().then(() => { document.getElementById('loading-overlay').style.display = 'none'; });
+
+        html2pdf().set({ 
+            margin: 0.5, 
+            filename: `RedSOS_${document.getElementById('pdf-nro').innerText}.pdf`, 
+            image: { type: 'jpeg', quality: 0.98 }, 
+            html2canvas: { scale: 2, windowWidth: 700 }, 
+            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } 
+        }).from(document.getElementById('pdf-template')).save().then(() => { 
+            document.getElementById('loading-overlay').style.display = 'none'; 
+        });
     }
 
+    // EXPORTAR E IMPORTAR
     function exportToCSV() {
         let csv = "ID,FECHA,SERVICIO,MONTO,PATENTE,VEHICULO,KM,MOTIVO,ESTADO,CONCILIADO,COBRADO\n";
-        records.forEach(r => { csv += `${r.id},${r.fecha||''},${r.servicio||''},${r.monto||''},${r.patente||''},${r.vehiculo||''},${r.km||''},"${(r.motivo||'').replace(/"/g, '""')}",${r.estado||''},${r.conciliado||''},${r.cobrado||''}\n`; });
-        const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = `RedSOS_Reporte.csv`; a.click();
+        records.forEach(r => { 
+            csv += `${r.id},${r.fecha||''},${r.servicio||''},${r.monto||''},${r.patente||''},${r.vehiculo||''},${r.km||''},"${(r.motivo||'').replace(/"/g, '""')}",${r.estado||''},${r.conciliado||''},${r.cobrado||''}\n`; 
+        });
+        const a = document.createElement("a"); 
+        a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); 
+        a.download = `RedSOS_Reporte.csv`; 
+        a.click();
     }
-    function exportBackup() { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(records)], { type: 'application/json' })); a.download = `RedSOS_Backup.json`; a.click(); }
+
+    function exportBackup() { 
+        const a = document.createElement("a"); 
+        a.href = URL.createObjectURL(new Blob([JSON.stringify(records)], { type: 'application/json' })); 
+        a.download = `RedSOS_Backup.json`; 
+        a.click(); 
+    }
+
     function importBackup(event) {
-        const f = event.target.files[0]; if (!f) return;
+        const f = event.target.files[0]; 
+        if (!f) return;
         const reader = new FileReader();
         reader.onload = async function(e) {
-            try { const imp = JSON.parse(e.target.result); if (confirm("¿Sumar a base actual?")) { const ids = new Set(records.map(r => r.id)); imp.forEach(n => { if (!ids.has(n.id)) records.push(n); }); } else { records = imp; } await saveToDrive(); render(); } catch (e) { alert("Inválido"); }
+            try { 
+                const imp = JSON.parse(e.target.result); 
+                if (confirm("¿Sumar a base actual? Cancelar reemplaza toda la base.")) { 
+                    const ids = new Set(records.map(r => r.id)); 
+                    imp.forEach(n => { if (!ids.has(n.id)) records.push(n); }); 
+                } else { 
+                    records = imp; 
+                } 
+                await saveToDrive(); 
+                render(); 
+            } catch (e) { 
+                alert("Archivo Inválido"); 
+            }
             event.target.value = '';
-        }; reader.readAsText(f);
+        }; 
+        reader.readAsText(f);
     }
 </script>
 </body>
